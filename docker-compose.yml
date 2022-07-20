@@ -1,0 +1,92 @@
+version: "3.9"
+
+services:
+  library-api:
+    restart: always
+    build:
+      context: ./server
+      dockerfile: Dockerfile.dev
+    container_name: library_mern_nginx
+    volumes:
+      - ./server:/app
+      - /app/node_modules
+    ports:
+      - 5001:5001
+    depends_on:
+      - mongo
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      MONGO_URI: mongodb://ameritec:MJec5gDnFk8Ky@mongo:27017/
+    networks:
+      - library-mern-api
+
+  mongo:
+    image: mongo
+    restart: always
+    container_name: library_mern_mongo
+    ports:
+      - 27017:27017
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: ameritec
+      MONGO_INITDB_ROOT_PASSWORD: MJec5gDnFk8Ky
+    #  volumes:
+    #    - mongodb-data:/data/db
+    networks:
+      - library-mern-api
+
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_MONGODB_ADMINUSERNAME: ameritec
+      ME_CONFIG_MONGODB_ADMINPASSWORD: MJec5gDnFk8Ky
+      ME_CONFIG_MONGODB_URL: mongodb://ameritec:MJec5gDnFk8Ky@mongo:27017/
+    #  volumes:
+    #    - /mongodb-data:/var/lib/docker/volumes/ameritec-web_mongodb-data/_data
+    networks:
+      - library-mern-api
+
+  client:
+    stdin_open: true
+    restart: always
+    build:
+      context: ./client
+      dockerfile: Dockerfile
+    container_name: library_mern_frontend
+    environment:
+      NODE_ENV: ${NODE_ENV}
+    volumes:
+      - ./client:/app
+      - /app/node_modules
+    ports:
+      - 3000:3000
+    depends_on:
+      - library-api
+    networks:
+      - library-mern-api
+
+  nginx:
+    restart: always
+    depends_on:
+      - library-api
+      - client
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile.dev
+    volumes:
+      - ./nginx/certs:/etc/nginx/certs
+    #  ports:
+    #    - 80:80
+    #    - 443:443
+    networks:
+      - library-mern-api
+
+networks:
+  library-mern-api:
+    driver: bridge
+
+volumes:
+  mongodb-data:
+    driver: local

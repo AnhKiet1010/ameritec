@@ -1,0 +1,18 @@
+FROM node:14-alpine3.10
+
+LABEL version="1.0"
+LABEL description="React Frontend for the Library API"
+
+WORKDIR /app
+
+COPY ./package.json ./
+
+RUN apk add --update python make g++\
+   && rm -rf /var/cache/apk/*
+
+RUN npm cache clean --force
+RUN npm install
+
+COPY . .
+
+CMD [ "npm", "start" ]
