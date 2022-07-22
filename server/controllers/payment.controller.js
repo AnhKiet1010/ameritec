@@ -9,7 +9,23 @@ const Commission = require("../models/commission.model");
 const Activation = require("../models/activation.model");
 const Package = require("../models/package.model");
 const fs = require('fs');
-const { levelUpMail, thankMail, successMail, renewSuccess, getActiveLink, returnCommission, createCloneBuyPackage3, createCloneBuyPackage4, updateParent, checkLevel, checkPoint, remindRenew1Mail, remindRenew2Mail, reciveCommissonMail, paymentSuccessMail, removeAccents } = require("./method");
+const { 
+  checkChildPoint,
+  levelUpMail, 
+  thankMail, 
+  successMail,
+  renewSuccess,
+  getActiveLink,
+  returnCommission,
+  createCloneBuyPackage3, 
+  createCloneBuyPackage4, 
+  updateParent, checkLevel, 
+  checkPoint, 
+  remindRenew1Mail, 
+  remindRenew2Mail, 
+  reciveCommissonMail,
+  paymentSuccessMail, 
+  removeAccents } = require("./method");
 const jwt = require("jsonwebtoken");
 const axios = require("axios");
 const bcrypt = require("bcrypt");
@@ -354,6 +370,7 @@ async function processDataActivation(data, token, trans_id, orderId) {
         // updateParent(invite_code, buy_package);
         await checkPoint(donate_sales_id);
         await checkLevel(donate_sales_id);
+        await checkChildPoint(donate_sales_id);
       }
 
       // --------------- GET APP ACTIVATIONS LINKS -------------------
