@@ -97,6 +97,53 @@ exports.systemCountLevelAllUsers = async (req, res,) => {
   });
 };
 
+exports.checkPoint = async (id) => {
+  return await checkPoint(id);
+}
+const checkPoint = async (id) => {
+  if (id && id !== process.env.INVITE_CODE) {
+    var user = await User.findOne({ _id: id }).exec();
+  } else {
+    return 0;
+  }
+  if (!user) {
+    return 0;
+  }
+  var base_point = user.buy_package === "1" ? 0.25 : 1;
+  var point_old = user.point;
+  var list_child = await User.find({ parent_id: id }).exec();
+  let binus_point = 0;
+  for (var child of list_child) {
+    if ((child.expired !== false || child.is_delete === true) && child.is_clone === false) {
+      if (child.buy_package === "1") {
+        binus_point += 0.25;
+      }
+      if (child.buy_package === "2") {
+        binus_point += 1;
+      }
+      if (child.buy_package === "3") {
+        binus_point += 10;
+      }
+      if (child.buy_package === "4") {
+        binus_point += 4;
+      }
+    }
+    base_point += child.point;
+  }
+  await User.findOneAndUpdate({ _id: id },
+    {
+      point: base_point - binus_point
+    }).exec();
+  var compare = base_point - binus_point;
+  if (compare !== point_old) {
+    await checkLevel(user.parent_id);
+    await checkPoint(user.parent_id);
+  }
+}
+exports.checkLevel = async (id) => {
+  return await checkLevel(id);
+}
+
 const checkLevel = async (id) => {
 
   if (id && id !== process.env.INVITE_CODE) {
@@ -439,47 +486,101 @@ const checkLevel = async (id) => {
   return 0;
 }
 
-const checkPoint = async (id) => {
-  if (id && id !== process.env.INVITE_CODE) {
-    var user = await User.findOne({ _id: id }).exec();
-  } else {
-    return 0;
-  }
-  if (!user) {
-    return 0;
-  }
-  var base_point = user.buy_package === "1" ? 0.25 : 1;
-  var point_old = user.point;
-  var list_child = await User.find({ parent_id: id }).exec();
-  let binus_point = 0;
-  for (var child of list_child) {
-    if ((child.expired !== false || child.is_delete === true) && child.is_clone === false) {
-      if (child.buy_package === "1") {
-        binus_point += 0.25;
-      }
-      if (child.buy_package === "2") {
-        binus_point += 1;
-      }
-      if (child.buy_package === "3") {
-        binus_point += 10;
-      }
-      if (child.buy_package === "4") {
-        binus_point += 4;
-      }
-    }
-    base_point += child.point;
-  }
-  await User.findOneAndUpdate({ _id: id },
-    {
-      point: base_point - binus_point
-    }).exec();
-  var compare = base_point - binus_point;
-  if (compare !== point_old) {
-    await checkLevel(user.parent_id);
-    await checkPoint(user.parent_id);
-  }
-}
 
+exports.checkChildPoint = async(id)=>{
+  return await checkChildPoint(id);
+}
+const checkChildPoint = async (id)=>{
+  try{
+    if (id && id !== process.env.INVITE_CODE) {
+      var user = await User.findOne({ _id: id }).exec();
+    } else {
+      return 0;
+    }
+    if (!user) {
+      return 0;
+    }
+    if(user.gender == "N/A"){
+      user.gender=1;
+    }
+    if(user.child1 == null){
+      user.child1= {
+        arr: [],
+        countChild: 0,
+        countPoint: 0,
+      };
+    }
+    if(user.child2 == null){
+      user.child2= {
+        arr: [],
+        countChild: 0,
+        countPoint: 0,
+      };
+    }
+    if(user.child3 == null){
+      user.child3= {
+        arr: [],
+        countChild: 0,
+        countPoint: 0,
+      };
+    }
+    await user.save();
+    var tree = await Tree.findOne({parent:id}).exec();
+    
+    var totalchild1 = await countTotalChildMember(tree.group1);
+    var totalchild2 = await countTotalChildMember(tree.group2);
+    var totalchild3 = await countTotalChildMember(tree.group3);
+  
+    var totalpoint1 = await sumPoint(tree.group1);
+    var totalpoint2 = await sumPoint(tree.group2);
+    var totalpoint3 = await sumPoint(tree.group3);
+  
+    // console.log("child",totalchild1 + "/"+totalchild2 + "/"+totalchild3 );
+    // console.log("point",totalpoint1 + "/"+totalpoint2 + "/"+totalpoint3 );
+    // console.log("user",user);
+    var flag = false;
+    if(totalchild1!=user.child1.countChild){
+      user.child1.countChild=totalchild1;
+      flag=true;
+    }
+    if(totalchild2!=user.child2.countChild){
+      user.child2.countChild=totalchild2;
+      flag=true;
+    }
+    if(totalchild3!=user.child3.countChild){
+      user.child3.countChild=totalchild3;
+      flag=true;
+    }
+   
+    if(totalpoint1!=user.child1.countPoint){
+      user.child1.countPoint=totalpoint1;
+      flag=true;
+    }
+    if(totalpoint2!=user.child2.countPoint){
+      user.child2.countPoint=totalpoint2;
+      flag=true;
+    }
+    if(totalpoint3!=user.child3.countPoint){
+      user.child3.countPoint=totalpoint3;
+      flag=true;
+    }
+  
+    if(flag){
+      await user.save();
+      console.log("Update success: ",user.id)
+      checkChildPoint(user.parent_id);
+      return 2;
+    }
+    
+    return 1;
+  }
+  catch(error){
+    console.log("id",id);
+    console.log(error);
+    return -1;
+  }
+  
+}
 // const sumPoint = async (array_user_id) => {
 //   var kq = 0;
 //   for (var ele of array_user_id) {
@@ -512,12 +613,6 @@ exports.calPointLevelAllUser = async (req, res) => {
     await checkPoint(user._id);
     await checkLevel(user._id);
   }
-}
-exports.checkPoint = async (id) => {
-  return await checkPoint(id);
-}
-exports.checkLevel = async (id) => {
-  return await checkLevel(id);
 }
 
 const checkUpLevel = async (id, buy_package) => {
@@ -1370,6 +1465,7 @@ const getListChildId = async (id) => {
 
   return [...group1, ...group2, ...group3];
 };
+
 
 exports.countTotalChildMember = async (subTreeIdList) => {
   // for (let id of subTreeIdList) {

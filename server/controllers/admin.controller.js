@@ -17,7 +17,7 @@ const bcrypt = require("bcrypt");
 const mongoose = require('mongoose');
 const { getActiveLink, returnCommission, randomString, createCloneBuyPackage3, successMail, thankMail, updateParent, getFullChildren,
   checkLevel, checkPoint, remindRenew1Mail, remindRenew2Mail, reciveCommissonMail, paymentSuccessMail, getMoreActiveLink, replenishActiveKey,
-  renewSuccess, levelUpMail, createCloneBuyPackage4
+  renewSuccess, levelUpMail, createCloneBuyPackage4, checkChildPoint
 } = require("./method");
 const { Mail } = require("./mail.js");
 const fs = require('fs');
@@ -32,6 +32,14 @@ exports.countPendingTransList = async (req, res) => {
   const count = await Transaction.countDocuments({ status: "pending" }).exec();
   res.json({
     count
+  });
+}
+
+exports.checkChildPoint = async (req,res)=>{
+  const { id } = req.params;
+  await checkChildPoint(id);
+  res.json({
+     id
   });
 }
 
@@ -76,9 +84,12 @@ const getTreeChild = async (idcha) => {
       await child3.push(await getInfoChild(element));
     }
   }
-  const total1 = await countTotalChildMember(child1);
-  const total2 = await countTotalChildMember(child2);
-  const total3 = await countTotalChildMember(child3);
+  // const total1 = await countTotalChildMember(child1);
+  // const total2 = await countTotalChildMember(child2);
+  // const total3 = await countTotalChildMember(child3);
+  const total1 = userCha.child1.countChild;
+  const total2 = userCha.child2.countChild;
+  const total3 = userCha.child3.countChild;
   var Cha = {
     _id: userCha._id,
     full_name: userCha.full_name,
@@ -91,17 +102,17 @@ const getTreeChild = async (idcha) => {
     child1: {
       arr: child1,
       countChild: total1,
-      sumPoint: await sumPoint(child1),
+      sumPoint: userCha.child1.countPoint,
     },
     child2: {
       arr: child2,
       countChild: total2,
-      sumPoint: await sumPoint(child2),
+      sumPoint: userCha.child2.countPoint,
     },
     child3: {
       arr: child3,
       countChild: total3,
-      sumPoint: await sumPoint(child3),
+      sumPoint: userCha.child3.countPoint,
     },
     expired: userCha.expired
   };
@@ -138,21 +149,28 @@ const getInfoChild = async (id) => {
     buy_package: userCha.buy_package,
     avatar: userCha.avatar,
     point: userCha.point,
-    countChild: await countTotalChildMember(await getListChildId(id)),
+    //countChild: await countTotalChildMember(await getListChildId(id)),
+    countChild: userCha.child1.countChild +userCha.child2.countChild+userCha.child3.countChild,
     child1: {
       arr: child1,
-      sumPoint: await sumPoint(child1),
-      countChild: await countTotalChildMember(child1),
+      //sumPoint: await sumPoint(child1),
+      //countChild: await countTotalChildMember(child1),
+      sumPoint:userCha.child1.countPoint,
+      countChild:userCha.child1.countChild
     },
     child2: {
       arr: child2,
-      sumPoint: await sumPoint(child2),
-      countChild: await countTotalChildMember(child2),
+      // sumPoint: await sumPoint(child2),
+      // countChild: await countTotalChildMember(child2),
+      sumPoint:userCha.child2.countPoint,
+      countChild:userCha.child2.countChild
     },
     child3: {
       arr: child3,
-      sumPoint: await sumPoint(child3),
-      countChild: await countTotalChildMember(child3),
+      // sumPoint: await sumPoint(child3),
+      // countChild: await countTotalChildMember(child3),
+      sumPoint:userCha.child3.countPoint,
+      countChild:userCha.child3.countChild
     },
     expired: userCha.expired
   };
@@ -2354,10 +2372,11 @@ exports.updateCloneToBuyPackage3 = async (req, res) => {
 }
 
 exports.calPointLevelAllUser = async (req, res) => {
-  const listUser = await User.find({ $and: [{ role: { $ne: 'admin' } }, { role: { $ne: 'system' } }, { role: { $ne: 'accountant' } }] }).exec();
+  const listUser = await User.find({ $and: [{ role: { $ne: 'admin' } }, { role: { $ne: 'system' } }, { role: { $ne: 'accountant' } },{ role: { $ne: 'accountant1' } }] }).sort('created_time').exec();
   for (let user of listUser) {
     await checkPoint(user._id);
     await checkLevel(user._id);
+    await checkChildPoint(user._id);
   }
   res.json({
     status: 200,

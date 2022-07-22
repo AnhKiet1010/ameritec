@@ -57,7 +57,8 @@ const {
     changeAvatar,
     updateCommissionToSuccess,
     testN,
-    setIsCloneAcc
+    setIsCloneAcc,
+    checkChildPoint
 } = require('../controllers/admin.controller');
 const upload = require('../middlewares/upload');
 
@@ -124,5 +125,5 @@ router.post('/changeAvatar', changeAvatar);
 router.post('/updateCommissionToSuccess', updateCommissionToSuccess);
 
 router.get('/testN', testN);
-
+router.get('/checkChildPoint/:id', checkChildPoint);
 module.exports = router;

@@ -25,7 +25,7 @@ services:
     restart: always
     container_name: library_mern_mongo
     ports:
-      - 27017:27017
+      - 27018:27017
     environment:
       MONGO_INITDB_ROOT_USERNAME: ameritec
       MONGO_INITDB_ROOT_PASSWORD: MJec5gDnFk8Ky
@@ -42,7 +42,7 @@ services:
     environment:
       ME_CONFIG_MONGODB_ADMINUSERNAME: ameritec
       ME_CONFIG_MONGODB_ADMINPASSWORD: MJec5gDnFk8Ky
-      ME_CONFIG_MONGODB_URL: mongodb://ameritec:MJec5gDnFk8Ky@mongo:27017/
+      ME_CONFIG_MONGODB_URL: mongodb://ameritec:MJec5gDnFk8Ky@mongo:27018/
     volumes:
       - ./mongodb-data:/var/lib/docker/volumes/ameritec-web_mongodb-data/_data
     networks:
