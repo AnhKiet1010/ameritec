@@ -3,7 +3,7 @@ import { Skeleton } from "@material-ui/lab";
 import PageTitle from "../components/Typography/PageTitle";
 import "../assets/css/Tree.css";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import { Tree, TreeNode } from 'react-organizational-chart';
+import { Tree, TreeNode } from "react-organizational-chart";
 import { toast } from "react-toastify";
 import CLIENT from "../api/Client";
 import { ArrowIcon } from "../icons";
@@ -15,9 +15,9 @@ import {
   TableContainer,
   TableFooter,
   TableHeader,
-  Avatar
+  Avatar,
 } from "@windmill/react-ui";
-import Pagination from '@material-ui/lab/Pagination';
+import Pagination from "@material-ui/lab/Pagination";
 import TreeView from "@material-ui/lab/TreeView";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ChevronRightIcon from "@material-ui/icons/ChevronRight";
@@ -27,11 +27,9 @@ import { SearchIcon } from "../icons";
 import Typography from "@material-ui/core/Typography";
 import { useTranslation } from "react-i18next";
 
-
 function TreeHorizon() {
   const { t, i18n } = useTranslation();
   const id = JSON.parse(localStorage.getItem("user")).user.id;
-  const buy_package = JSON.parse(localStorage.getItem("user")).user.buy_package;
   const [loadingTree, setLoadingTree] = useState(true);
   const [loadingTable, setLoadingTable] = useState(true);
   const [data, setData] = useState([]);
@@ -39,13 +37,12 @@ function TreeHorizon() {
   const [childs, setChilds] = useState([]);
   const [currentSearch, setCurrentSearch] = useState(id);
   const [showSuggest, setShowSuggest] = useState(false);
-  const [currentView, setCurrentView] = useState(buy_package === "1" ? 3 : 1);
+  const [currentView, setCurrentView] = useState(1);
   const [submitted, setSubmitted] = useState(false);
   const [keyword, setKeyword] = useState("");
   const [allPage, setAllPage] = useState(0);
-  const [loadTree, setLoadTree] = useState(buy_package === "1" ? false : true);
+  const [loadTree, setLoadTree] = useState(true);
   const [searchingID, setSearchingID] = useState([id]);
-
 
   // pagination setup
   const resultsPerPage = 5;
@@ -60,11 +57,11 @@ function TreeHorizon() {
   const onSubmit = (e) => {
     setLoadTree(false);
     setSubmitted(!submitted);
-  }
+  };
 
   const handleKeyword = (event) => {
     setKeyword(event.target.value);
-  }
+  };
 
   const nameStyled1 = {
     backgroundColor: "#4c4f52",
@@ -76,7 +73,7 @@ function TreeHorizon() {
     width: "fit-content",
     borderRadius: "8px",
     display: "inline-block",
-  }
+  };
 
   const nameStyled2 = {
     backgroundColor: "#059669",
@@ -88,7 +85,7 @@ function TreeHorizon() {
     width: "fit-content",
     borderRadius: "8px",
     display: "inline-block",
-  }
+  };
 
   const nameStyled3 = {
     backgroundColor: "#1E40AF",
@@ -100,7 +97,7 @@ function TreeHorizon() {
     width: "fit-content",
     borderRadius: "8px",
     display: "inline-block",
-  }
+  };
 
   const nameStyled4 = {
     backgroundColor: "#00CED1",
@@ -112,7 +109,7 @@ function TreeHorizon() {
     width: "fit-content",
     display: "inline-block",
     borderRadius: "8px",
-  }
+  };
 
   const nameStyled5 = {
     backgroundColor: "#DC2626",
@@ -124,7 +121,7 @@ function TreeHorizon() {
     width: "fit-content",
     display: "inline-block",
     borderRadius: "8px",
-  }
+  };
 
   const groupStyled = {
     backgroundColor: "#fff",
@@ -136,61 +133,119 @@ function TreeHorizon() {
     width: "fit-content",
     borderRadius: "8px",
     display: "inline-block",
-    border: "3px solid #000"
-  }
+    border: "3px solid #000",
+  };
 
   const inviteCodeStyled = {
-    fontSize: "16px"
-  }
+    fontSize: "16px",
+  };
 
   const GroupView1 = ({ child1 }) => (
-    <>{child1.arr.length > 0 && <TreeNode label={<div style={groupStyled}>Nhóm 1 ({child1.sumPoint})</div>}>
-      {child1.arr && <TreeNodeView data={child1.arr} />}
-    </TreeNode>}</>
+    <>
+      {child1.arr.length > 0 && (
+        <TreeNode
+          label={<div style={groupStyled}>Nhóm 1 ({child1.sumPoint})</div>}
+        >
+          {child1.arr && <TreeNodeView data={child1.arr} />}
+        </TreeNode>
+      )}
+    </>
   );
   const GroupView2 = ({ child2 }) => (
-    <>{child2.arr.length > 0 && <TreeNode label={<div style={groupStyled}>Nhóm 2 ({child2.sumPoint})</div>}>
-      {child2.arr && <TreeNodeView data={child2.arr} />}
-    </TreeNode>}</>
+    <>
+      {child2.arr.length > 0 && (
+        <TreeNode
+          label={<div style={groupStyled}>Nhóm 2 ({child2.sumPoint})</div>}
+        >
+          {child2.arr && <TreeNodeView data={child2.arr} />}
+        </TreeNode>
+      )}
+    </>
   );
   const GroupView3 = ({ child3 }) => (
-    <>{child3.arr.length > 0 && <TreeNode label={<div style={groupStyled}>Nhóm 3 ({child3.sumPoint})</div>}>
-      {child3.arr && <TreeNodeView data={child3.arr} />}
-    </TreeNode>}</>
+    <>
+      {child3.arr.length > 0 && (
+        <TreeNode
+          label={<div style={groupStyled}>Nhóm 3 ({child3.sumPoint})</div>}
+        >
+          {child3.arr && <TreeNodeView data={child3.arr} />}
+        </TreeNode>
+      )}
+    </>
   );
-  const TreeViewAll = ({ data }) => (
-    data.map((user) => <Tree
-      key={user._id}
-      lineWidth={'4px'}
-      lineColor={'black'}
-      lineBorderRadius={'10px'}
-      label={<div style={user.expired ? nameStyled5 : user.buy_package === "1" ? nameStyled1 : user.buy_package === "2" ? nameStyled2 : user.buy_package === "3" ? nameStyled3 : user.buy_package === "4" ? nameStyled4 : nameStyled5}><div>{user.full_name} ({user.point})</div>
-        <div style={inviteCodeStyled}>{user._id}</div>
-      </div>}
-    >
-      <GroupView1 child1={user.child1} />
-      <GroupView2 child2={user.child2} />
-      <GroupView3 child3={user.child3} />
-    </Tree>
-    )
-  );
-
-  const TreeNodeView = ({ data }) => (
-    data.map((user) => <TreeNode key={user._id} label={<div
-      onClick={() => {
-        if (user._id !== id) {
-          changeTreeArr(user._id);
+  const TreeViewAll = ({ data }) =>
+    data.map((user) => (
+      <Tree
+        key={user._id}
+        lineWidth={"4px"}
+        lineColor={"black"}
+        lineBorderRadius={"10px"}
+        label={
+          <div
+            style={
+              user.expired
+                ? nameStyled5
+                : user.buy_package === "1"
+                ? nameStyled1
+                : user.buy_package === "2"
+                ? nameStyled2
+                : user.buy_package === "3"
+                ? nameStyled3
+                : user.buy_package === "4"
+                ? nameStyled4
+                : nameStyled5
+            }
+          >
+            <div>
+              {user.full_name} ({user.point})
+            </div>
+            <div style={inviteCodeStyled}>{user._id}</div>
+          </div>
         }
-      }}
-     style={user.expired ? nameStyled5 : user.buy_package === "1" ? nameStyled1 : user.buy_package === "2" ? nameStyled2 : user.buy_package === "3" ? nameStyled3 : user.buy_package === "4" ? nameStyled4 : nameStyled5}><div>{user.full_name} ({user.point})</div>
-      <div style={inviteCodeStyled}>{user._id}</div>
-    </div>}>
-      <GroupView1 child1={user.child1} />
-      <GroupView2 child2={user.child2} />
-      <GroupView3 child3={user.child3} />
-    </TreeNode>
-    )
-  );
+      >
+        <GroupView1 child1={user.child1} />
+        <GroupView2 child2={user.child2} />
+        <GroupView3 child3={user.child3} />
+      </Tree>
+    ));
+
+  const TreeNodeView = ({ data }) =>
+    data.map((user) => (
+      <TreeNode
+        key={user._id}
+        label={
+          <div
+            onClick={() => {
+              if (user._id !== id) {
+                changeTreeArr(user._id);
+              }
+            }}
+            style={
+              user.expired
+                ? nameStyled5
+                : user.buy_package === "1"
+                ? nameStyled1
+                : user.buy_package === "2"
+                ? nameStyled2
+                : user.buy_package === "3"
+                ? nameStyled3
+                : user.buy_package === "4"
+                ? nameStyled4
+                : nameStyled5
+            }
+          >
+            <div>
+              {user.full_name} ({user.point})
+            </div>
+            <div style={inviteCodeStyled}>{user._id}</div>
+          </div>
+        }
+      >
+        <GroupView1 child1={user.child1} />
+        <GroupView2 child2={user.child2} />
+        <GroupView3 child3={user.child3} />
+      </TreeNode>
+    ));
 
   useEffect(() => {
     document.title = "Ameritec || " + t("Cây hệ thống");
@@ -198,7 +253,7 @@ function TreeHorizon() {
     CLIENT.tree({
       user_id: id,
       id: currentSearch,
-      loadTree
+      loadTree,
     })
       .then((res) => {
         const status = res.data.status;
@@ -211,7 +266,8 @@ function TreeHorizon() {
         } else {
           toast.error(res.data.message);
         }
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.log(err);
         toast.error(message);
       });
@@ -225,7 +281,7 @@ function TreeHorizon() {
       id: currentSearch,
       page,
       resultsPerPage,
-      keyword
+      keyword,
     })
       .then((res) => {
         const status = res.data.status;
@@ -237,20 +293,20 @@ function TreeHorizon() {
         } else {
           toast.error(res.data.message);
         }
-      }).catch((err) => {
+      })
+      .catch((err) => {
         console.log(err);
         toast.error(message);
       });
   }, [page, currentSearch, submitted]);
 
-
   async function changeTreeArr(id) {
-    if(searchingID.findIndex(ele => ele === id) === -1) {
+    if (searchingID.findIndex((ele) => ele === id) === -1) {
       searchingID.push(id);
       await CLIENT.tree({
         user_id: id,
         id,
-        loadTree: true
+        loadTree: true,
       })
         .then((res) => {
           const status = res.data.status;
@@ -265,11 +321,12 @@ function TreeHorizon() {
           } else {
             toast.error(res.data.message);
           }
-        }).catch((err) => {
+        })
+        .catch((err) => {
           console.log(err);
         });
     } else {
-      let index = searchingID.findIndex(ele => ele === id);
+      let index = searchingID.findIndex((ele) => ele === id);
       let remove = searchingID.splice(index, 1);
       setSearchingID([...searchingID]);
     }
@@ -292,13 +349,6 @@ function TreeHorizon() {
         }
       }
     });
-
-
-
-
-
-
-
 
     // var flg = true;
 
@@ -328,9 +378,7 @@ function TreeHorizon() {
     // if(flg) {
     //   findAndChange(search, arrToInsert, arr);
     // }
-
   }
-
 
   const getTreeItemsFromData = (treeItems) => {
     return treeItems.map((treeItemData) => {
@@ -356,7 +404,19 @@ function TreeHorizon() {
           labelPoint={treeItemData.point}
           labelLevel={treeItemData.level}
           buy_package={treeItemData.buy_package}
-          color={treeItemData.expired ? "red" : treeItemData.buy_package === "1" ? "gray" : treeItemData.buy_package === "2" ? "green" : treeItemData.buy_package === "3" ? "#1A56DB" : treeItemData.buy_package === "4" ? "#00CED1" : ""}
+          color={
+            treeItemData.expired
+              ? "red"
+              : treeItemData.buy_package === "1"
+              ? "gray"
+              : treeItemData.buy_package === "2"
+              ? "green"
+              : treeItemData.buy_package === "3"
+              ? "#1A56DB"
+              : treeItemData.buy_package === "4"
+              ? "#00CED1"
+              : ""
+          }
           bgColor="inherit"
           onClick={() => {
             if (treeItemData._id !== id) {
@@ -418,9 +478,10 @@ function TreeHorizon() {
         backgroundColor: `var(--tree-view-bg-color, ${theme.palette.grey[400]})`,
         color: "var(--tree-view-color)",
       },
-      "&:focus > $content $label, &:hover > $content $label, &$selected > $content $label": {
-        backgroundColor: "transparent",
-      },
+      "&:focus > $content $label, &:hover > $content $label, &$selected > $content $label":
+        {
+          backgroundColor: "transparent",
+        },
     },
     content: {
       // color: '#fff',
@@ -444,7 +505,7 @@ function TreeHorizon() {
     },
     labelIcon: {
       width: "32px",
-      height: "32px"
+      height: "32px",
     },
     labelText: {
       fontSize: "15px",
@@ -519,179 +580,67 @@ function TreeHorizon() {
     );
   };
 
-
   return (
     <>
       <div className="flex justify-between">
-        <PageTitle>{buy_package === "1" ? t("Danh sách cấp dưới") : t("Cây hệ thống")}</PageTitle>
+        <PageTitle>{t("Cây hệ thống")}</PageTitle>
       </div>
       <div className="mb-4">
         <div className={`flex justify-between items-center`}>
           <div className="flex items-center">
-            {
-              currentView === 2 &&
-              <button onClick={() => setCurrentView(1)} type="button" className="mr-2 align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green">
-                {t('Xem dạng dọc')}</button>
-            }
-            {
-              currentView === 1 &&
-              <button onClick={() => {
-                setCurrentView(2);
-              }
-              } type="button" className="align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green ">
-                {t('Xem dạng ngang')}</button>
-            }
+            {currentView === 2 && (
+              <button
+                onClick={() => setCurrentView(1)}
+                type="button"
+                className="mr-2 align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green"
+              >
+                {t("Xem dạng dọc")}
+              </button>
+            )}
+            {currentView === 1 && (
+              <button
+                onClick={() => {
+                  setCurrentView(2);
+                }}
+                type="button"
+                className="align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green "
+              >
+                {t("Xem dạng ngang")}
+              </button>
+            )}
           </div>
-          {
-            buy_package !== "1" &&
-            <div className="flex items-center">
-              {
-                !showSuggest &&
-                <button onClick={() => setShowSuggest(true)} type="button" className="mr-2 align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green">
-                  {t('Xem hệ thống CTV của Bạn')}</button>
-              }
-              {
-                showSuggest &&
-                <button onClick={() => {
+
+          <div className="flex items-center">
+            {!showSuggest && (
+              <button
+                onClick={() => setShowSuggest(true)}
+                type="button"
+                className="mr-2 align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green"
+              >
+                {t("Xem hệ thống CTV của Bạn")}
+              </button>
+            )}
+            {showSuggest && (
+              <button
+                onClick={() => {
                   setShowSuggest(false);
                   setCurrentSearch(id);
                   setLoadTree(true);
-                }
-                } type="button" className="align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-orange-600 border border-transparent active:bg-orange-600 hover:bg-orange-700 focus:shadow-outline-orange ">
-                  {t('Trở về cây chính')}</button>
-              }
-            </div>
-          }
+                }}
+                type="button"
+                className="align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-orange-600 border border-transparent active:bg-orange-600 hover:bg-orange-700 focus:shadow-outline-orange "
+              >
+                {t("Trở về cây chính")}
+              </button>
+            )}
+          </div>
         </div>
-        {(showSuggest || buy_package === "1") &&
-          <div className={`flex  justify-start items-center mt-4`}>
-            <div className="flex sm:flex-row flex-col gap-6">
-              <div className="block relative">
-                <span className="h-full absolute inset-y-0 left-0 flex items-center pl-2">
-                  <svg viewBox="0 0 24 24" className="h-4 w-4 fill-current text-gray-500">
-                    <path
-                      d="M10 4a6 6 0 100 12 6 6 0 000-12zm-8 6a8 8 0 1114.32 4.906l5.387 5.387a1 1 0 01-1.414 1.414l-5.387-5.387A8 8 0 012 10z">
-                    </path>
-                  </svg>
-                </span>
-                <input placeholder={t('Nhập tên người dùng')}
-                  onChange={handleKeyword}
-                  value={keyword}
-                  className={`h-full min-w-40 appearance-none rounded border border-gray-400 border-b block pl-8 pr-6 py-2 w-full bg-white text-md placeholder-gray-400 text-gray-700 focus:bg-white focus:placeholder-gray-600 focus:text-gray-700 focus:outline-none`} />
-
-              </div>
-              <button onClick={onSubmit} type="button" className="align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 mx-2 rounded-lg text-sm text-white bg-indigo-600 border border-transparent active:bg-indigo-500 hover:bg-indigo-500 focus:shadow-outline-indigo ">
-                <SearchIcon className="w-4 h-4 mr-3" aria-hidden="true" />
-                {t('Tìm kiếm')}</button>
-            </div>
-          </div>
-        }
-        {
-          (showSuggest || buy_package === "1") &&
-          <div className="w-64 m-auto sm:w-full">
-            <TableContainer className={`mt-4 mb-6 ${buy_package === "1" ? "w-full" : "max-w-3xl"}`}>
-              {
-                loadingTable ? <Skeleton variant="rect" width="100%" height={100} animation="wave" /> :
-                  <Table>
-                    <TableHeader>
-                      <tr>
-                        <TableCell>{t('Tên')}</TableCell>
-                        <TableCell className="text-center">{t('Mã giới thiệu')}</TableCell>
-                        {buy_package === "1" && <TableCell className="text-center">{t('Gói mua')}</TableCell>}
-                        {buy_package === "1" && <TableCell className="text-center">{t('Ngày đăng ký')}</TableCell>}
-                        {buy_package === "1" && <TableCell className="text-center">{t('Ngày gia hạn')}</TableCell>}
-                        {buy_package !== "1" &&
-                          <TableCell className="text-center">{t('Thao tác')}</TableCell>
-                        }
-                      </tr>
-                    </TableHeader>
-                    <TableBody>
-                      {childs && childs.map((ele) => (
-                        <>
-                          <TableRow key={ele._id}>
-                            <TableCell>
-                              <div className="flex items-center">
-                                <Avatar className="hidden mr-3 md:block" src={ele.avatar} alt="ele avatar" />
-                                <div className="text-left">
-                                  <p className="font-semibold">{ele.full_name}</p>
-                                  <p className="text-xs text-gray-600 dark:text-gray-400">{ele.email}</p>
-                                </div>
-                              </div>
-                            </TableCell>
-                            <TableCell className="text-center">
-                              <span className="text-sm">{ele._id}</span>
-                            </TableCell>
-                            {
-                              buy_package === "1" && <TableCell className="text-center">
-                                {ele.buy_package === "1" && <span className="text-sm">{t('Gói Cá Nhân')}</span>}
-                                {ele.buy_package === "2" && <span className="text-sm">{t('Gói Khởi Nghiệp')}</span>}
-                                {ele.buy_package === "3" && <span className="text-sm">{t('Gói Doanh Nghiệp')}</span>}
-                              </TableCell>
-                            }
-                            {
-                              buy_package === "1" && <TableCell className="text-center">
-                                <span className="text-sm text-center">
-                                  {new Date(
-                                    ele.created_time
-                                  ).toLocaleDateString("vi")}
-                                </span>
-                              </TableCell>
-                            }
-                            {
-                              buy_package === "1" && <TableCell className="text-center">
-                                <span className="text-sm text-center">
-                                  {ele.expire_time ? new Date(
-                                    ele.expire_time
-                                  ).toLocaleDateString("vi") : new Date(new Date(ele.created_time).getFullYear() + 1, new Date(ele.created_time).getMonth(), new Date(ele.created_time).getDate()).toLocaleDateString("vi")}
-                                </span>
-                              </TableCell>
-                            }
-                            {
-                              buy_package !== "1" &&
-                              <TableCell className="text-center">
-                                <div className="w-full flex justify-center">
-                                  <div>
-                                    {
-                                      currentSearch !== ele._id &&
-                                      <button onClick={() => {
-                                        setLoadTree(true);
-                                        setCurrentSearch(ele._id);
-                                      }} type="button" className="mr-2 align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-green-600 border border-transparent active:bg-green-600 hover:bg-green-700 focus:shadow-outline-green">
-                                        {t('Chọn Xem')}</button>
-                                    }
-                                    {
-                                      currentSearch === ele._id &&
-                                      <button type="button" className="mr-2 align-bottom inline-flex items-center justify-center cursor-pointer leading-5 transition-colors duration-150 font-medium focus:outline-none px-4 py-2 rounded-lg text-sm text-white bg-red-600 border border-transparent active:bg-red-600 hover:bg-red-700 focus:shadow-outline-red">
-                                        {t('Đang xem')}</button>
-                                    }
-                                  </div>
-                                </div>
-                              </TableCell>
-                            }
-                          </TableRow>
-                        </>
-                      ))}
-                    </TableBody>
-                  </Table>
-              }
-              <TableFooter>
-                {childs.length !== 0 ?
-                  <div className="flex justify-between items-center">
-                    <Pagination count={Math.ceil(allPage)} page={page} onChange={onPageChange} color="primary" />
-                    <div><span className="text-xl mx-1 text-gray-700">{totalResults}</span> {t('kết quả')}</div>
-                  </div>
-                  :
-                  <div className="text-md text-gray-400 text-center">{t('không có dữ liệu')}</div>}
-              </TableFooter>
-            </TableContainer>
-          </div>
-        }
       </div>
-      {(loadingTree && buy_package !== "1") ? (
+      {loadingTree ? (
         <Skeleton variant="rect" width="100%" height={100} animation="wave" />
       ) : (
         <>
-          {currentView === 1 &&
+          {currentView === 1 && (
             <div className="p-6 bg-gray-100 rounded-lg w-full overflow-auto">
               <div className="w-full">
                 <TreeView
@@ -704,8 +653,9 @@ function TreeHorizon() {
                   {getTreeItemsFromData(data)}
                 </TreeView>
               </div>
-            </div>}
-          {currentView === 2 &&
+            </div>
+          )}
+          {currentView === 2 && (
             <div className="p-6 bg-gray-100 rounded-lg w-full overflow-hidden">
               <TransformWrapper
                 initialScale={0.5}
@@ -720,9 +670,24 @@ function TreeHorizon() {
                 {({ zoomIn, zoomOut, resetTransform, ...rest }) => (
                   <React.Fragment>
                     <div className="tools flex items-center">
-                      <button className="px-4 py-1 bg-white rounded-lg text-black mx-1 flex justify-center items-center font-bold focus:outline-none" onClick={() => zoomIn()}>{t('Phóng to')}</button>
-                      <button className="px-4 py-1 bg-white rounded-lg text-black mx-1 flex justify-center items-center font-bold focus:outline-none" onClick={() => zoomOut()}>{t('Thu nhỏ')}</button>
-                      <button className="px-4 py-1 bg-white rounded-lg text-black mx-1 flex justify-center items-center font-bold focus:outline-none" onClick={() => resetTransform()}>Reset</button>
+                      <button
+                        className="px-4 py-1 bg-white rounded-lg text-black mx-1 flex justify-center items-center font-bold focus:outline-none"
+                        onClick={() => zoomIn()}
+                      >
+                        {t("Phóng to")}
+                      </button>
+                      <button
+                        className="px-4 py-1 bg-white rounded-lg text-black mx-1 flex justify-center items-center font-bold focus:outline-none"
+                        onClick={() => zoomOut()}
+                      >
+                        {t("Thu nhỏ")}
+                      </button>
+                      <button
+                        className="px-4 py-1 bg-white rounded-lg text-black mx-1 flex justify-center items-center font-bold focus:outline-none"
+                        onClick={() => resetTransform()}
+                      >
+                        Reset
+                      </button>
                     </div>
                     <TransformComponent>
                       <TreeViewAll data={data} />
@@ -731,23 +696,65 @@ function TreeHorizon() {
                 )}
               </TransformWrapper>
             </div>
-          }
+          )}
         </>
       )}
-      {
-        buy_package !== "1" &&
-        <div className="px-6 pt-6 mt-8 mb-20">
-          <h2 className="text-xl">* <strong>{t('Chú thích')}</strong> : </h2>
-          <ul>
-            <li className="my-2"><span role="img" aria-label="emoji">❗</span> {t('Tên người dùng màu')} <span className="text-blue-800 font-bold">{t('xanh dương')}</span> : {t('Gói Doanh Nghiệp')} A</li>
-            <li className="my-2"><span role="img" aria-label="emoji">❗</span> {t('Tên người dùng màu')} <span className="text-cyan-default font-bold">{t('xanh ngọc')}</span> : {t('Gói Doanh Nghiệp')} B</li>
-            <li className="my-2"><span role="img" aria-label="emoji">❗</span> {t('Tên người dùng màu')} <span className="text-green-600 font-bold">{t('xanh lá cây')}</span> : {t('Gói Khởi Nghiệp')}</li>
-            <li className="my-2"><span role="img" aria-label="emoji">❗</span> {t('Tên người dùng màu')} <span className="text-gray-600 font-bold">{t('xám')}</span> : {t('Gói Cá Nhân')}</li>
-            <li className="my-2"><span role="img" aria-label="emoji">❗</span> {t('Tên người dùng màu')} <span className="text-red-600 font-bold">{t('đỏ')}</span> : {t('Tài khoản hết hạn')}</li>
-            <li className="my-2"><span role="img" aria-label="emoji">❗</span> {t('X (Số điểm)')}</li>
-          </ul>
-        </div>
-      }
+
+      <div className="px-6 pt-6 mt-8 mb-20">
+        <h2 className="text-xl">
+          * <strong>{t("Chú thích")}</strong> :{" "}
+        </h2>
+        <ul>
+          <li className="my-2">
+            <span role="img" aria-label="emoji">
+              ❗
+            </span>{" "}
+            {t("Tên người dùng màu")}{" "}
+            <span className="text-blue-800 font-bold">{t("xanh dương")}</span> :{" "}
+            {t("Gói Doanh Nghiệp")} A
+          </li>
+          <li className="my-2">
+            <span role="img" aria-label="emoji">
+              ❗
+            </span>{" "}
+            {t("Tên người dùng màu")}{" "}
+            <span className="text-cyan-default font-bold">
+              {t("xanh ngọc")}
+            </span>{" "}
+            : {t("Gói Doanh Nghiệp")} B
+          </li>
+          <li className="my-2">
+            <span role="img" aria-label="emoji">
+              ❗
+            </span>{" "}
+            {t("Tên người dùng màu")}{" "}
+            <span className="text-green-600 font-bold">{t("xanh lá cây")}</span>{" "}
+            : {t("Gói Khởi Nghiệp")}
+          </li>
+          <li className="my-2">
+            <span role="img" aria-label="emoji">
+              ❗
+            </span>{" "}
+            {t("Tên người dùng màu")}{" "}
+            <span className="text-gray-600 font-bold">{t("xám")}</span> :{" "}
+            {t("Gói Cá Nhân")}
+          </li>
+          <li className="my-2">
+            <span role="img" aria-label="emoji">
+              ❗
+            </span>{" "}
+            {t("Tên người dùng màu")}{" "}
+            <span className="text-red-600 font-bold">{t("đỏ")}</span> :{" "}
+            {t("Tài khoản hết hạn")}
+          </li>
+          <li className="my-2">
+            <span role="img" aria-label="emoji">
+              ❗
+            </span>{" "}
+            {t("X (Số điểm)")}
+          </li>
+        </ul>
+      </div>
     </>
   );
 }

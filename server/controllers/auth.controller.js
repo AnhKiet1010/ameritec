@@ -5,12 +5,17 @@ const Commission = require("../models/commission.model");
 const Activation = require("../models/activation.model");
 const Package = require("../models/package.model");
 const axios = require("axios");
-const { thankMail, successMail, randomString, removeAccents } = require("./method");
+const {
+  thankMail,
+  successMail,
+  randomString,
+  removeAccents,
+} = require("./method");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const { Mail } = require("./mail");
 const MailTemplate = require("../models/mailtemplate.model");
-const fs = require('fs');
+const fs = require("fs");
 
 const saltRounds = 10;
 
@@ -40,7 +45,9 @@ exports.checkLinkController = async (req, res) => {
       });
     } else {
       const invalid_invite_code = await User.findById(invite_code).exec();
-      const invalid_donate_sales_id = await User.findById(donate_sales_id).exec();
+      const invalid_donate_sales_id = await User.findById(
+        donate_sales_id
+      ).exec();
 
       if (!invalid_invite_code || !invalid_donate_sales_id) {
         res.json({
@@ -49,42 +56,33 @@ exports.checkLinkController = async (req, res) => {
           errors: [],
         });
       } else {
-        if (invalid_invite_code.is_delete || !invalid_invite_code.is_partner || !invalid_invite_code.active || invalid_invite_code.expired) {
+        if (
+          invalid_invite_code.is_delete ||
+          !invalid_invite_code.is_partner ||
+          !invalid_invite_code.active ||
+          invalid_invite_code.expired
+        ) {
           res.json({
             status: 400,
             message: "Link giới thiệu không đúng",
             errors: [],
           });
         } else {
-
-          if (invalid_invite_code.buy_package === '1') {
-            if (group !== "1") {
-              res.json({
-                status: 400,
-                message: "Link giới thiệu không đúng",
-                errors: [],
-              });
-            }
-          }
-
-          if (invalid_invite_code.buy_package === '2' || invalid_invite_code.buy_package === '3') {
-            if (group === "1" || group === "2" || group === "3") {
-              res.json({
-                status: 200,
-                message: "",
-                errors: [],
-              });
-            } else {
-              console.log('err here');
-              res.json({
-                status: 400,
-                message: "Link giới thiệu không đúng",
-                errors: [],
-              });
-            }
+          if (group === "1" || group === "2" || group === "3") {
+            res.json({
+              status: 200,
+              message: "",
+              errors: [],
+            });
+          } else {
+            console.log("err here");
+            res.json({
+              status: 400,
+              message: "Link giới thiệu không đúng",
+              errors: [],
+            });
           }
         }
-
       }
     }
   }
@@ -96,10 +94,30 @@ exports.getPackageList = async (req, res) => {
   res.json({
     status: 200,
     data: {
-      pricePrivate: lang === 'vi' ? listPackage[0].price_vnd.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") : listPackage[0].price_usd,
-      priceStartup: lang === 'vi' ? listPackage[1].price_vnd.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") : listPackage[1].price_usd,
-      priceBusiness: lang === 'vi' ? listPackage[2].price_vnd.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") : listPackage[2].price_usd,
-      priceBusinessB: lang === 'vi' ? listPackage[3].price_vnd.toString().replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,") : listPackage[3].price_usd,
+      pricePrivate:
+        lang === "vi"
+          ? listPackage[0].price_vnd
+              .toString()
+              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+          : listPackage[0].price_usd,
+      priceStartup:
+        lang === "vi"
+          ? listPackage[1].price_vnd
+              .toString()
+              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+          : listPackage[1].price_usd,
+      priceBusiness:
+        lang === "vi"
+          ? listPackage[2].price_vnd
+              .toString()
+              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+          : listPackage[2].price_usd,
+      priceBusinessB:
+        lang === "vi"
+          ? listPackage[3].price_vnd
+              .toString()
+              .replace(/(\d)(?=(\d{3})+(?!\d))/g, "$1,")
+          : listPackage[3].price_usd,
       activePrivate: listPackage[0].active,
       activeStartup: listPackage[1].active,
       activeBusiness: listPackage[2].active,
@@ -108,13 +126,13 @@ exports.getPackageList = async (req, res) => {
     message: "",
     errors: [],
   });
-}
+};
 
 exports.checkTransId = async (req, res) => {
   const { transId } = req.body;
   const trans = await Transaction.findById({ _id: transId }).exec();
 
-  if (!trans || trans.status !== 'pending') {
+  if (!trans || trans.status !== "pending") {
     res.json({
       status: 400,
       message: "",
@@ -125,12 +143,12 @@ exports.checkTransId = async (req, res) => {
       status: 200,
       message: "",
       data: {
-        trans
+        trans,
       },
       errors: [],
     });
   }
-}
+};
 
 exports.registerController = async (req, res) => {
   const {
@@ -157,7 +175,7 @@ exports.registerController = async (req, res) => {
     state,
     ss,
     request_commission,
-    drive_id
+    drive_id,
   } = req.body;
 
   const user_repeat_email = await User.findOne({ email }).exec();
@@ -170,7 +188,9 @@ exports.registerController = async (req, res) => {
     errors.push({ label: "email", err_message: "Email này đã được sử dụng" });
   }
 
-  const user_repeat_id_code = await User.findOne({ $and: [{ id_code: id_code }, { id_code: { $ne: "" } }] }).exec();
+  const user_repeat_id_code = await User.findOne({
+    $and: [{ id_code: id_code }, { id_code: { $ne: "" } }],
+  }).exec();
 
   if (user_repeat_id_code) {
     errors.push({
@@ -186,7 +206,6 @@ exports.registerController = async (req, res) => {
       message: "Có lỗi xảy ra!",
     });
   } else {
-
     const files = req.files;
     var cmndMT = "";
     var cmndMS = "";
@@ -195,47 +214,60 @@ exports.registerController = async (req, res) => {
       const randomstring = randomString();
 
       // name of front image
-      cmndMT = randomstring + '_front.' + files.CMND_Front[0].filename.split('.').pop();
-      fs.rename('./' + files.CMND_Front[0].path, './public/uploads/cmnd/' + cmndMT, (err) => {
-        if (err) console.log(err);
-      });
+      cmndMT =
+        randomstring +
+        "_front." +
+        files.CMND_Front[0].filename.split(".").pop();
+      fs.rename(
+        "./" + files.CMND_Front[0].path,
+        "./public/uploads/cmnd/" + cmndMT,
+        (err) => {
+          if (err) console.log(err);
+        }
+      );
 
       // name of back image
-      cmndMS = randomstring + '_back.' + files.CMND_Back[0].filename.split('.').pop();
-      fs.rename('./' + files.CMND_Back[0].path, './public/uploads/cmnd/' + cmndMS, (err) => {
-        if (err) console.log(err);
-      });
+      cmndMS =
+        randomstring + "_back." + files.CMND_Back[0].filename.split(".").pop();
+      fs.rename(
+        "./" + files.CMND_Back[0].path,
+        "./public/uploads/cmnd/" + cmndMS,
+        (err) => {
+          if (err) console.log(err);
+        }
+      );
     }
     const datenow = new Date();
 
-    const token = jwt.sign({
-      full_name,
-      email: email.toLowerCase(),
-      password,
-      phone,
-      id_code,
-      issued_by,
-      bank,
-      bank_account,
-      bank_name,
-      iden_type,
-      tax_code,
-      birthday: new Date(birthday).setHours(0, 0, 0),
-      gender,
-      invite_code,
-      donate_sales_id,
-      group_number,
-      buy_package,
-      id_time: new Date(id_time).setHours(0, 0, 0),
-      is_partner,
-      account_type,
-      cmndMT,
-      cmndMS,
-      state,
-      ss,
-      request_commission,
-      drive_id
-    },
+    const token = jwt.sign(
+      {
+        full_name,
+        email: email.toLowerCase(),
+        password,
+        phone,
+        id_code,
+        issued_by,
+        bank,
+        bank_account,
+        bank_name,
+        iden_type,
+        tax_code,
+        birthday: new Date(birthday).setHours(0, 0, 0),
+        gender,
+        invite_code,
+        donate_sales_id,
+        group_number,
+        buy_package,
+        id_time: new Date(id_time).setHours(0, 0, 0),
+        is_partner,
+        account_type,
+        cmndMT,
+        cmndMS,
+        state,
+        ss,
+        request_commission,
+        drive_id,
+      },
       process.env.JWT_ACCOUNT_ACTIVATION,
       { expiresIn: "48h" }
     );
@@ -245,8 +277,12 @@ exports.registerController = async (req, res) => {
 
     const listPackage = await Package.find().exec();
 
-    const amount_vnd = listPackage.find((ele) => ele.sid == buy_package).price_vnd;
-    const amount_usd = listPackage.find((ele) => ele.sid == buy_package).price_usd;
+    const amount_vnd = listPackage.find(
+      (ele) => ele.sid == buy_package
+    ).price_vnd;
+    const amount_usd = listPackage.find(
+      (ele) => ele.sid == buy_package
+    ).price_usd;
 
     var invite_name = "Công Ty";
     if (invite_code !== process.env.INVITE_CODE) {
@@ -271,9 +307,8 @@ exports.registerController = async (req, res) => {
       buy_package,
       amount_vnd,
       amount_usd,
-      account_type
+      account_type,
     });
-
 
     await newTransaction.save(function (err) {
       if (err) {
@@ -300,13 +335,18 @@ exports.registerController = async (req, res) => {
       }
     });
   }
-}
+};
 
 exports.loginController = async (req, res) => {
   const { acc, password } = req.body;
   await User.findOne({
-    $and: [{ email: acc.toLowerCase() }, { is_clone: { $ne: true } },
-    { is_partner: true }, { is_delete: false }, { expired: false }, { active: true }
+    $and: [
+      { email: acc.toLowerCase() },
+      { is_clone: { $ne: true } },
+      { is_partner: true },
+      { is_delete: false },
+      { expired: false },
+      { active: true },
     ],
   }).exec((err, user) => {
     if (err || !user) {
@@ -329,7 +369,7 @@ exports.loginController = async (req, res) => {
         // generate a token and send to client
         const access_token = jwt.sign(
           {
-            _id: user._id
+            _id: user._id,
           },
           process.env.JWT_SECRET,
           {
@@ -350,8 +390,8 @@ exports.loginController = async (req, res) => {
               role: user.role,
               phone: user.phone,
               email: user.email,
-              buy_package: user.buy_package
-            }
+              buy_package: user.buy_package,
+            },
           },
           message: "Đăng nhập thành công",
           errors: [],
@@ -409,14 +449,16 @@ const countTotalChildMemberForLevel = async (
 exports.forgotPasswordController = async (req, res) => {
   const { email } = req.body;
 
-  const user = await User.findOne({$and : [{email}, {is_clone: false}]}).exec();
+  const user = await User.findOne({
+    $and: [{ email }, { is_clone: false }],
+  }).exec();
 
   if (!user) {
     res.json({
       status: 404,
       message: "Người dùng với email này không tồn tại",
       errors: [],
-      data: {}
+      data: {},
     });
   } else {
     const token = jwt.sign(
@@ -428,16 +470,19 @@ exports.forgotPasswordController = async (req, res) => {
         expiresIn: "15m",
       }
     );
-    var mail = await MailTemplate.findOne({ template_name: "resetpass" }).exec();
-    var signature = await MailTemplate.findOne({ template_name: "signature" }).exec();
+    var mail = await MailTemplate.findOne({
+      template_name: "resetpass",
+    }).exec();
+    var signature = await MailTemplate.findOne({
+      template_name: "signature",
+    }).exec();
     var content;
     var subject;
-    var linkreset = process.env.CLIENT_URL + '/users/password/reset/' + token;
+    var linkreset = process.env.CLIENT_URL + "/users/password/reset/" + token;
     if (user.account_type == "vi") {
       content = mail.content_vn;
       content = content.replace("[CHU_KY]", signature.content_vn);
       subject = mail.subject_vn;
-
     }
     if (user.account_type == "en") {
       content = mail.content_en;
@@ -446,19 +491,19 @@ exports.forgotPasswordController = async (req, res) => {
     }
     content = content.replace("[LINK_RESET_PASS]", linkreset);
     try {
-
       await Mail(email, content, subject);
       console.log("forgot pass sended!!!! to", email);
 
-      await user.updateOne({
-        reset_password_link: token,
-      }).exec();
+      await user
+        .updateOne({
+          reset_password_link: token,
+        })
+        .exec();
 
       return res.json({
         status: 200,
         message: `🎉 Mail đã được gửi đến ${email}`,
       });
-
     } catch (err) {
       console.log("error forgot pass mail!!!! to", email);
     }
@@ -467,7 +512,7 @@ exports.forgotPasswordController = async (req, res) => {
 
 exports.resetPasswordController = async (req, res) => {
   const { newPassword, token } = req.body;
-  console.log({newPassword});
+  console.log({ newPassword });
 
   const reset_password_link = token;
 
@@ -479,7 +524,7 @@ exports.resetPasswordController = async (req, res) => {
         if (err) {
           return res.json({
             status: 401,
-            message: "Đường link đã hết hạn.Vui lòng thử lại"
+            message: "Đường link đã hết hạn.Vui lòng thử lại",
           });
         }
 
@@ -488,7 +533,7 @@ exports.resetPasswordController = async (req, res) => {
         if (!user) {
           return res.json({
             status: 401,
-            message: "Đường link đã hết hạn.Vui lòng thử lại"
+            message: "Đường link đã hết hạn.Vui lòng thử lại",
           });
         } else {
           bcrypt.hash(newPassword, saltRounds, async function (err, hash) {
@@ -507,12 +552,13 @@ exports.resetPasswordController = async (req, res) => {
             if (!result) {
               return res.json({
                 status: 401,
-                message: "Lỗi khi update mật khẩu người dùng"
+                message: "Lỗi khi update mật khẩu người dùng",
               });
             } else {
               return res.json({
                 status: 200,
-                message: "🎉 Tuyệt vời! Bây giờ bạn có thể đăng nhập bằng mật khẩu mới của mình"
+                message:
+                  "🎉 Tuyệt vời! Bây giờ bạn có thể đăng nhập bằng mật khẩu mới của mình",
               });
             }
           });

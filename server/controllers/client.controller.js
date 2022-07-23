@@ -15,11 +15,11 @@ const {
   countTotalChildMember,
   randomString,
   upgradeMail,
-  removeAccents
+  removeAccents,
 } = require("./method");
-const fs = require('fs');
-const moment = require('moment');
-const bcrypt = require('bcrypt');
+const fs = require("fs");
+const moment = require("moment");
+const bcrypt = require("bcrypt");
 const saltRounds = 10;
 
 exports.dashboard = async (req, res) => {
@@ -56,7 +56,9 @@ exports.dashboard = async (req, res) => {
       targetNumber = 0;
       countLevel = 0;
   }
-  const treeOfUser = await Tree.findOne({ parent: id }).select("group1 group2 group3").exec();
+  const treeOfUser = await Tree.findOne({ parent: id })
+    .select("group1 group2 group3")
+    .exec();
   const totalChildMemberGroup1 = await countTotalChildMemberForLevel(
     [...treeOfUser.group1],
     user.level + 1,
@@ -79,10 +81,15 @@ exports.dashboard = async (req, res) => {
   );
   const countTotalChildWithPackage = await countTotalChildWithBuypackage(id);
 
-
   var amount_usd = 0;
   var amount_vnd = 0;
-  var commission = await Commission.find({ $and: [{ receive_mem_id: id }, { status: "success" }, { status: "success" }] }).exec();
+  var commission = await Commission.find({
+    $and: [
+      { receive_mem_id: id },
+      { status: "success" },
+      { status: "success" },
+    ],
+  }).exec();
   for (var ele of commission) {
     amount_usd = amount_usd + ele.amount_usd;
     amount_vnd = amount_vnd + ele.amount_vnd;
@@ -107,15 +114,15 @@ exports.dashboard = async (req, res) => {
           countPackage: {
             countPackage1,
             countPackage2,
-            countPackage3
+            countPackage3,
           },
           dayToExpired: diff,
           created_time: user.created_time,
           expired_time: user.expire_time,
           revenue: {
             amount_usd,
-            amount_vnd
-          }
+            amount_vnd,
+          },
         },
         errors: [],
       });
@@ -130,20 +137,20 @@ exports.dashboard = async (req, res) => {
           countPackage: {
             countPackage1,
             countPackage2,
-            countPackage3
+            countPackage3,
           },
           sumPoint: {
             sumPointGroup1,
             sumPointGroup2,
-            sumPointGroup3
+            sumPointGroup3,
           },
           dayToExpired: diff,
           created_time: user.created_time,
           expired_time: user.expire_time,
           revenue: {
             amount_usd,
-            amount_vnd
-          }
+            amount_vnd,
+          },
         },
         errors: [],
       });
@@ -162,14 +169,14 @@ exports.dashboard = async (req, res) => {
       countPackage: {
         countPackage1,
         countPackage2,
-        countPackage3
+        countPackage3,
       },
       sumPoint: {
         sumPointGroup1,
         sumPointGroup2,
-        sumPointGroup3
+        sumPointGroup3,
       },
-      dayToExpired: diff
+      dayToExpired: diff,
     },
     errors: [],
   });
@@ -182,20 +189,38 @@ exports.getHeaderDashBoard = async (req, res) => {
     $and: [
       { level_up_time: { $ne: "" } },
       {
-        level_up_time:
-        {
-          $gte: new Date(today.getFullYear(), today.getMonth(), today.getDate(), 0, 0, 0),
-          $lte: new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1, 0, 0, 0)
-        }
+        level_up_time: {
+          $gte: new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate(),
+            0,
+            0,
+            0
+          ),
+          $lte: new Date(
+            today.getFullYear(),
+            today.getMonth(),
+            today.getDate() + 1,
+            0,
+            0,
+            0
+          ),
+        },
       },
-    ]
+    ],
   }).exec();
   var listComission = await Commission.find({ status: "success" }).exec();
-  var pk1 = listComission.filter(comm => comm.buy_package == "1").length;
-  var pk2 = listComission.filter(comm => comm.buy_package == "2").length;
-  var pk3 = listComission.filter(comm => comm.buy_package == "3").length;
-  var pk4 = listComission.filter(comm => comm.buy_package == "4").length;
-  var pig = 18145 + pk1 * process.env.PIG_PACKAGE1 + pk2 * process.env.PIG_PACKAGE2 + pk3 * process.env.PIG_PACKAGE3 + pk4 * process.env.PIG_PACKAGE4;
+  var pk1 = listComission.filter((comm) => comm.buy_package == "1").length;
+  var pk2 = listComission.filter((comm) => comm.buy_package == "2").length;
+  var pk3 = listComission.filter((comm) => comm.buy_package == "3").length;
+  var pk4 = listComission.filter((comm) => comm.buy_package == "4").length;
+  var pig =
+    18145 +
+    pk1 * process.env.PIG_PACKAGE1 +
+    pk2 * process.env.PIG_PACKAGE2 +
+    pk3 * process.env.PIG_PACKAGE3 +
+    pk4 * process.env.PIG_PACKAGE4;
   var countNoti = 0;
   if (id) {
     countNoti = await Policy.countDocuments({ read_id: { $nin: id } }).exec();
@@ -206,11 +231,11 @@ exports.getHeaderDashBoard = async (req, res) => {
     data: {
       listLevelUpToday,
       piggy: pig,
-      countNoti
+      countNoti,
     },
     errors: [],
   });
-}
+};
 
 exports.dashboardTotalPoint = async (req, res) => {
   const { id } = req.params;
@@ -246,16 +271,12 @@ exports.dashboardTotalPoint = async (req, res) => {
       targetNumber = 0;
       countLevel = 0;
   }
-  const treeOfUser = await Tree.findOne({ parent: id }).select("group1 group2 group3").exec();
-  var sumPointGroup1 = await sumPoint(
-    [...treeOfUser.group1]
-  );
-  var sumPointGroup2 = await sumPoint(
-    [...treeOfUser.group2]
-  );;
-  var sumPointGroup3 = await sumPoint(
-    [...treeOfUser.group3]
-  );
+  const treeOfUser = await Tree.findOne({ parent: id })
+    .select("group1 group2 group3")
+    .exec();
+  var sumPointGroup1 = await sumPoint([...treeOfUser.group1]);
+  var sumPointGroup2 = await sumPoint([...treeOfUser.group2]);
+  var sumPointGroup3 = await sumPoint([...treeOfUser.group3]);
   var perGroup1 = (sumPointGroup1 / targetNumber) * 100;
   var perGroup2 = (sumPointGroup2 / targetNumber) * 100;
   var perGroup3 = (sumPointGroup3 / targetNumber) * 100;
@@ -333,13 +354,13 @@ exports.dashboardTotalPoint = async (req, res) => {
       sumPoint: {
         sumPointGroup1,
         sumPointGroup2,
-        sumPointGroup3
+        sumPointGroup3,
       },
       perGroup: {
         perGroup1,
         perGroup2,
-        perGroup3
-      }
+        perGroup3,
+      },
     },
     errors: [],
   });
@@ -359,7 +380,7 @@ exports.dashboardCountPackage = async (req, res) => {
         countPackage1,
         countPackage2,
         countPackage3,
-        countPackage4
+        countPackage4,
       },
     },
     errors: [],
@@ -372,7 +393,9 @@ exports.dashboardUserInfo = async (req, res) => {
 
   var amount_usd = 0;
   var amount_vnd = 0;
-  var commission = await Commission.find({ $and: [{ receive_mem_id: id }, { status: "success" }] }).exec();
+  var commission = await Commission.find({
+    $and: [{ receive_mem_id: id }, { status: "success" }],
+  }).exec();
   for (var ele of commission) {
     const package = await Package.findOne({ sid: ele.buy_package }).exec();
     amount_usd = amount_usd + package.price_usd;
@@ -393,8 +416,8 @@ exports.dashboardUserInfo = async (req, res) => {
           expired_time: user.expire_time,
           revenue: {
             amount_usd,
-            amount_vnd
-          }
+            amount_vnd,
+          },
         },
         errors: [],
       });
@@ -411,8 +434,8 @@ exports.dashboardUserInfo = async (req, res) => {
           expired_time: user.expire_time,
           revenue: {
             amount_usd,
-            amount_vnd
-          }
+            amount_vnd,
+          },
         },
         errors: [],
       });
@@ -431,7 +454,16 @@ exports.getRank500 = async (req, res) => {
   if (page > 1) {
     skip = (page - 1) * perPage;
   }
-  const listUser = await User.find({ role: 'normal', is_delete: false, active: true, expired: false }).sort({ level: -1, point: -1, _id: -1 }).limit(perPage).skip(skip).exec();
+  const listUser = await User.find({
+    role: "normal",
+    is_delete: false,
+    active: true,
+    expired: false,
+  })
+    .sort({ level: -1, point: -1, _id: -1 })
+    .limit(perPage)
+    .skip(skip)
+    .exec();
 
   res.json({
     status: 200,
@@ -439,20 +471,22 @@ exports.getRank500 = async (req, res) => {
       listUser,
     },
     errors: [],
-    message: ""
+    message: "",
   });
 };
 
 const countPackage = async (id, buy_package) => {
   var kq = 0;
   var listChild = await User.find({ parent_id: id }).exec();
-  var listChildFilter = listChild.filter(p => p.buy_package == buy_package && !p.is_clone);
+  var listChildFilter = listChild.filter(
+    (p) => p.buy_package == buy_package && !p.is_clone
+  );
   kq = kq + listChildFilter.length;
   for (var ele of listChild) {
-    kq = kq + await countPackage(ele._id, buy_package)
+    kq = kq + (await countPackage(ele._id, buy_package));
   }
   return kq;
-}
+};
 
 const countLevel = async (id, level) => {
   if (level == null) {
@@ -491,44 +525,65 @@ const countLevel = async (id, level) => {
       level = countLevel(id, level + 1);
     }
   }
-  var kq = level
+  var kq = level;
   return kq;
-}
+};
 
 const countTotalChildWithBuypackage = async (id) => {
   var countBuypackage1 = 0;
   var countBuypackage2 = 0;
   var countBuypackage3 = 0;
-  var array_child1 = await User.find({ parent_id: id, buy_package: "1" }).exec();
-  var array_child2 = await User.find({ parent_id: id, buy_package: "2" }).exec();
-  var array_child3 = await User.find({ parent_id: id, buy_package: "3" }).exec();
+  var array_child1 = await User.find({
+    parent_id: id,
+    buy_package: "1",
+  }).exec();
+  var array_child2 = await User.find({
+    parent_id: id,
+    buy_package: "2",
+  }).exec();
+  var array_child3 = await User.find({
+    parent_id: id,
+    buy_package: "3",
+  }).exec();
   countBuypackage1 = array_child1.length;
   countBuypackage2 = array_child2.length;
   countBuypackage3 = array_child3.length;
   for (var child of array_child1) {
-    var countTotalChildWithBuypackageChild = await countTotalChildWithBuypackage(child._id);
-    countBuypackage1 = countBuypackage1 + countTotalChildWithBuypackageChild.countBuypackage1;
-    countBuypackage2 = countBuypackage2 + countTotalChildWithBuypackageChild.countBuypackage2;
-    countBuypackage3 = countBuypackage3 + countTotalChildWithBuypackageChild.countBuypackage3;
+    var countTotalChildWithBuypackageChild =
+      await countTotalChildWithBuypackage(child._id);
+    countBuypackage1 =
+      countBuypackage1 + countTotalChildWithBuypackageChild.countBuypackage1;
+    countBuypackage2 =
+      countBuypackage2 + countTotalChildWithBuypackageChild.countBuypackage2;
+    countBuypackage3 =
+      countBuypackage3 + countTotalChildWithBuypackageChild.countBuypackage3;
   }
   for (var child of array_child2) {
-    var countTotalChildWithBuypackageChild = await countTotalChildWithBuypackage(child._id);
-    countBuypackage1 = countBuypackage1 + countTotalChildWithBuypackageChild.countBuypackage1;
-    countBuypackage2 = countBuypackage2 + countTotalChildWithBuypackageChild.countBuypackage2;
-    countBuypackage3 = countBuypackage3 + countTotalChildWithBuypackageChild.countBuypackage3;
+    var countTotalChildWithBuypackageChild =
+      await countTotalChildWithBuypackage(child._id);
+    countBuypackage1 =
+      countBuypackage1 + countTotalChildWithBuypackageChild.countBuypackage1;
+    countBuypackage2 =
+      countBuypackage2 + countTotalChildWithBuypackageChild.countBuypackage2;
+    countBuypackage3 =
+      countBuypackage3 + countTotalChildWithBuypackageChild.countBuypackage3;
   }
   for (var child of array_child3) {
-    var countTotalChildWithBuypackageChild = await countTotalChildWithBuypackage(child._id);
-    countBuypackage1 = countBuypackage1 + countTotalChildWithBuypackageChild.countBuypackage1;
-    countBuypackage2 = countBuypackage2 + countTotalChildWithBuypackageChild.countBuypackage2;
-    countBuypackage3 = countBuypackage3 + countTotalChildWithBuypackageChild.countBuypackage3;
+    var countTotalChildWithBuypackageChild =
+      await countTotalChildWithBuypackage(child._id);
+    countBuypackage1 =
+      countBuypackage1 + countTotalChildWithBuypackageChild.countBuypackage1;
+    countBuypackage2 =
+      countBuypackage2 + countTotalChildWithBuypackageChild.countBuypackage2;
+    countBuypackage3 =
+      countBuypackage3 + countTotalChildWithBuypackageChild.countBuypackage3;
   }
-  return data = {
+  return (data = {
     countBuypackage1: countBuypackage1,
     countBuypackage2: countBuypackage2,
     countBuypackage3: countBuypackage3,
-  }
-}
+  });
+};
 
 const countTotalChildMemberForLevel = async (
   subTreeIdList,
@@ -599,7 +654,6 @@ const countTotalPointInGroupForLevel = async (
         );
       }
     }
-
   }
   return count;
 };
@@ -615,8 +669,7 @@ const getListChildId = async (id) => {
 };
 
 const getTreeChild = async (idcha) => {
-  var userCha = await User.findOne({ _id: idcha })
-    .exec();
+  var userCha = await User.findOne({ _id: idcha }).exec();
   var listCon = await Tree.findOne({ parent: idcha })
     .select("group1 group2 group3")
     .exec();
@@ -658,14 +711,13 @@ const getTreeChild = async (idcha) => {
       // countChild: await countTotalChildMember(child3),
       sumPoint: await sumPoint(child3),
     },
-    expired: userCha.expired
+    expired: userCha.expired,
   };
   return Cha;
-}
+};
 
 const getInfoChild = async (id) => {
-  var userCha = await User.findOne({ _id: id })
-    .exec();
+  var userCha = await User.findOne({ _id: id }).exec();
   var child1 = [];
   var child2 = [];
   var child3 = [];
@@ -689,10 +741,10 @@ const getInfoChild = async (id) => {
       arr: child3,
       sumPoint: await sumPoint(child3),
     },
-    expired: userCha.expired
+    expired: userCha.expired,
   };
   return Cha;
-}
+};
 const sumPoint = async (array_user_id) => {
   var kq = 0;
   let binus_point = 0;
@@ -706,7 +758,7 @@ const sumPoint = async (array_user_id) => {
     }
   }
   return kq - binus_point;
-}
+};
 
 exports.getChildInTree = async (req, res) => {
   const { id, keyword, user_id } = req.body;
@@ -727,7 +779,11 @@ exports.getChildInTree = async (req, res) => {
       message: "",
     });
   }
-  if (user.buy_package === "2" || user.buy_package === "3" || user.buy_package === "4") {
+  if (
+    user.buy_package === "2" ||
+    user.buy_package === "3" ||
+    user.buy_package === "4"
+  ) {
     const listChildArr = await getInfoFullChildren(user_id, keyword);
     res.json({
       status: 200,
@@ -743,28 +799,27 @@ exports.getChildInTree = async (req, res) => {
 };
 
 exports.tree = async (req, res) => {
-  console.log('body', req.body);
+  console.log("body", req.body);
   const { id, user_id } = req.body;
   const loadTree = req.body.loadTree;
 
   var user = await User.findOne({ _id: id }).exec();
-  if (user.buy_package == "2" || user.buy_package === "3" || user.buy_package === "4") {
-    const root = [];
-    if (loadTree) {
-      const result = await getTreeChild(id);
-      root.push(result);
-    }
 
-    res.json({
-      status: 200,
-      data: {
-        group: root,
-        loadTree
-      },
-      errors: [],
-      message: "",
-    });
+  const root = [];
+  if (loadTree) {
+    const result = await getTreeChild(id);
+    root.push(result);
   }
+
+  res.json({
+    status: 200,
+    data: {
+      group: root,
+      loadTree,
+    },
+    errors: [],
+    message: "",
+  });
 };
 
 const updateParent = async (id, buy_package) => {
@@ -779,7 +834,10 @@ const updateParent = async (id, buy_package) => {
     }
   );
 
-  if (parent.parent_id === "AMERITEC" || parent.parent_id === "AMERITECAIPS1109") {
+  if (
+    parent.parent_id === "AMERITEC" ||
+    parent.parent_id === "AMERITECAIPS1109"
+  ) {
     return;
   } else {
     await updateParent(parent.parent_id, buy_package);
@@ -865,15 +923,20 @@ exports.profile = async (req, res) => {
   const { id } = req.params;
   const user = await User.findOne({ _id: id }).exec();
   let invite_id = user.parent_id;
-  if(user.invite_user_id && user.invite_user_id !== "") {
+  if (user.invite_user_id && user.invite_user_id !== "") {
     invite_id = user.invite_user_id;
   }
 
   var listInfo = [];
-  if (user.account_type === 'vi') {
+  if (user.account_type === "vi") {
     listInfo = [
       { label: "Số chứng minh thư", value: user.id_code },
-      { label: "Ngày cấp", value: user.id_time ? new Date(user.id_time).toLocaleDateString('vi') : "" },
+      {
+        label: "Ngày cấp",
+        value: user.id_time
+          ? new Date(user.id_time).toLocaleDateString("vi")
+          : "",
+      },
       { label: "Nơi cấp", value: user.issued_by },
       { label: "Số tài khoản", value: user.bank_account },
       { label: "Ngân hàng", value: user.bank },
@@ -881,14 +944,17 @@ exports.profile = async (req, res) => {
       { label: "Mã số Thuế", value: user.tax_code ? user.tax_code : "" },
       { label: "cmndMT", value: user.cmndMT },
       { label: "cmndMS", value: user.cmndMS },
-    ]
+    ];
   } else {
     listInfo = [
       { label: "SS# or TAX ID", value: user.ss },
       { label: "State", value: user.state },
       { label: "Driver's License", value: user.drive_id },
-      { label: "State, Froms of receiving commissions", value: user.request_commission },
-    ]
+      {
+        label: "State, Froms of receiving commissions",
+        value: user.request_commission,
+      },
+    ];
   }
 
   res.json({
@@ -900,18 +966,39 @@ exports.profile = async (req, res) => {
         { label: "Email", value: user.email },
         { label: "Số điện thoại", value: user.phone },
         {
-          label: "Gói mua", value: user.account_type === 'en' ? PACKAGE.find(ele => ele.value === user.buy_package).label_en :
-            PACKAGE.find(ele => ele.value === user.buy_package).label
+          label: "Gói mua",
+          value:
+            user.account_type === "en"
+              ? PACKAGE.find((ele) => ele.value === user.buy_package).label_en
+              : PACKAGE.find((ele) => ele.value === user.buy_package).label,
         },
-        { label: "Ngày tháng năm sinh", value: user.birthday ? new Date(user.birthday).toLocaleDateString('vi') : "" },
-        { label: "Giới tính", value: user.gender === 2 ? "Nam" : user.gender === 3 ? "Nữ" : "N/A" },
-        { label: "Người giới thiệu", value: invite_id !== process.env.INVITE_CODE ? (await User.findOne({ _id: invite_id, is_delete: false }).exec()).full_name : "Công Ty" },
-        ...listInfo
-      ]
-
+        {
+          label: "Ngày tháng năm sinh",
+          value: user.birthday
+            ? new Date(user.birthday).toLocaleDateString("vi")
+            : "",
+        },
+        {
+          label: "Giới tính",
+          value: user.gender === 2 ? "Nam" : user.gender === 3 ? "Nữ" : "N/A",
+        },
+        {
+          label: "Người giới thiệu",
+          value:
+            invite_id !== process.env.INVITE_CODE
+              ? (
+                  await User.findOne({
+                    _id: invite_id,
+                    is_delete: false,
+                  }).exec()
+                ).full_name
+              : "Công Ty",
+        },
+        ...listInfo,
+      ],
     },
     errors: [],
-    message: ""
+    message: "",
   });
 };
 
@@ -924,13 +1011,15 @@ exports.editProfile = async (req, res) => {
     password,
     request_commission,
     newPassword,
-    id
+    id,
   } = req.body;
 
   const errors = [];
-  const list_id_clone = await User.find({ parent_id: id, is_clone: true }).select("_id").exec();
+  const list_id_clone = await User.find({ parent_id: id, is_clone: true })
+    .select("_id")
+    .exec();
   var arr_id_clone = [];
-  list_id_clone.map(p => arr_id_clone.push(p._id));
+  list_id_clone.map((p) => arr_id_clone.push(p._id));
   const user = await User.findOne({ _id: id }).exec();
 
   bcrypt.compare(password, user.password, async function (err, result) {
@@ -939,7 +1028,7 @@ exports.editProfile = async (req, res) => {
       return res.json({
         status: 400,
         errors: [{ label: "password" }],
-        message: "Mật khẩu không đúng. Vui lòng thử lại"
+        message: "Mật khẩu không đúng. Vui lòng thử lại",
       });
     } else {
       // const valid_phone = await User.findOne({ $and: [{ phone }, { _id: { $ne: id } }, { is_clone: false }] }).exec();
@@ -957,7 +1046,7 @@ exports.editProfile = async (req, res) => {
         res.json({
           status: 400,
           errors,
-          message: "Có thông tin bị trùng.Vui lòng thử lại!"
+          message: "Có thông tin bị trùng.Vui lòng thử lại!",
         });
       } else {
         let change = false;
@@ -1009,7 +1098,10 @@ exports.editProfile = async (req, res) => {
             }
           ).exec();
           await Commission.updateMany({ receive_mem_id: id }, { bank }).exec();
-          await Commission.updateMany({ receive_mem_id: { $in: arr_id_clone } }, { bank }).exec();
+          await Commission.updateMany(
+            { receive_mem_id: { $in: arr_id_clone } },
+            { bank }
+          ).exec();
           change = true;
         }
         if (user.bank_account !== bank_account) {
@@ -1025,8 +1117,14 @@ exports.editProfile = async (req, res) => {
               bank_account,
             }
           ).exec();
-          await Commission.updateMany({ receive_mem_id: id }, { bank_account }).exec();
-          await Commission.updateMany({ receive_mem_id: { $in: arr_id_clone } }, { bank_account }).exec();
+          await Commission.updateMany(
+            { receive_mem_id: id },
+            { bank_account }
+          ).exec();
+          await Commission.updateMany(
+            { receive_mem_id: { $in: arr_id_clone } },
+            { bank_account }
+          ).exec();
           change = true;
         }
         if (user.bank_name !== bank_name) {
@@ -1042,8 +1140,14 @@ exports.editProfile = async (req, res) => {
               bank_name,
             }
           ).exec();
-          await Commission.updateMany({ receive_mem_id: id }, { bank_name }).exec();
-          await Commission.updateMany({ receive_mem_id: { $in: arr_id_clone } }, { bank_name }).exec();
+          await Commission.updateMany(
+            { receive_mem_id: id },
+            { bank_name }
+          ).exec();
+          await Commission.updateMany(
+            { receive_mem_id: { $in: arr_id_clone } },
+            { bank_name }
+          ).exec();
           change = true;
         }
         if (user.request_commission !== request_commission) {
@@ -1064,36 +1168,48 @@ exports.editProfile = async (req, res) => {
           const randomstring = randomString();
 
           // name of front image
-          cmndMT = randomstring + '_front.' + files.CMND_Front[0].filename.split('.').pop();
-          fs.rename('./' + files.CMND_Front[0].path, './public/uploads/cmnd/' + cmndMT, (err) => {
-            if (err) console.log(err);
-          });
+          cmndMT =
+            randomstring +
+            "_front." +
+            files.CMND_Front[0].filename.split(".").pop();
+          fs.rename(
+            "./" + files.CMND_Front[0].path,
+            "./public/uploads/cmnd/" + cmndMT,
+            (err) => {
+              if (err) console.log(err);
+            }
+          );
 
           // name of back image
-          cmndMS = randomstring + '_back.' + files.CMND_Back[0].filename.split('.').pop();
-          fs.rename('./' + files.CMND_Back[0].path, './public/uploads/cmnd/' + cmndMS, (err) => {
-            if (err) console.log(err);
-          });
+          cmndMS =
+            randomstring +
+            "_back." +
+            files.CMND_Back[0].filename.split(".").pop();
+          fs.rename(
+            "./" + files.CMND_Back[0].path,
+            "./public/uploads/cmnd/" + cmndMS,
+            (err) => {
+              if (err) console.log(err);
+            }
+          );
           await User.findOneAndUpdate(
             { _id: id },
             {
               cmndMT,
-              cmndMS
+              cmndMS,
             }
           ).exec();
           await User.updateMany(
             { parent_id: id, is_clone: true },
             {
               cmndMT,
-              cmndMS
+              cmndMS,
             }
           ).exec();
           change = true;
         }
 
-
         if (change) {
-
           await User.findOneAndUpdate(
             { _id: id },
             {
@@ -1107,14 +1223,14 @@ exports.editProfile = async (req, res) => {
             errors: [],
             data: {
               newUser: await User.findOne({ _id: id }).exec(),
-              change
-            }
+              change,
+            },
           });
         } else {
           res.json({
             status: 200,
             message: "Cập nhật thông tin thành công 🎉",
-            errors: []
+            errors: [],
           });
         }
       }
@@ -1124,70 +1240,82 @@ exports.editProfile = async (req, res) => {
 
 exports.getPolicyList = async (req, res) => {
   const { currentTable } = req.body;
-  const listPolicy = await Policy.find({ $and: [{ is_delete: false }, { category: currentTable }] }).sort({ _id: -1 }).exec();
+  const listPolicy = await Policy.find({
+    $and: [{ is_delete: false }, { category: currentTable }],
+  })
+    .sort({ _id: -1 })
+    .exec();
   const result = [];
 
   for (let policy of listPolicy) {
-    policy.is_read = policy.read_id.includes(req.user_id)
+    policy.is_read = policy.read_id.includes(req.user_id);
     result.push(policy);
   }
 
   res.json({
     status: 200,
     data: {
-      listPolicy: result
+      listPolicy: result,
     },
     errors: [],
-    message: ""
+    message: "",
   });
-}
+};
 
 exports.getPolicy = async (req, res) => {
-  const {
-    id
-  } = req.body;
+  const { id } = req.body;
 
   const policy = await Policy.findOne({ _id: id }).exec();
   const newReadArr = [...policy.read_id];
   if (!newReadArr.includes(req.user_id)) {
     newReadArr.push(req.user_id);
 
-    await Policy.findOneAndUpdate({ _id: id }, { read_id: [...newReadArr] }).exec();
+    await Policy.findOneAndUpdate(
+      { _id: id },
+      { read_id: [...newReadArr] }
+    ).exec();
   }
 
   res.json({
     status: 200,
     message: "",
     data: {
-      policy
+      policy,
     },
     errors: [],
   });
-}
+};
 
 exports.receipts = async (req, res) => {
   const { id } = req.params;
   const user = await User.findOne({ _id: id }).exec();
-  const transaction = await Transaction.find({ user_id: user._id, status: 'success' }).exec();
-  const commission = await Commission.find({ receive_mem_id: user._id }).sort({ _id: -1 }).exec();
-  const listBonus = await Bonus.find({ $and: [{ receive_mem_id: req.user_id }, { is_delete: false }] }).exec();
+  const transaction = await Transaction.find({
+    user_id: user._id,
+    status: "success",
+  }).exec();
+  const commission = await Commission.find({ receive_mem_id: user._id })
+    .sort({ _id: -1 })
+    .exec();
+  const listBonus = await Bonus.find({
+    $and: [{ receive_mem_id: req.user_id }, { is_delete: false }],
+  }).exec();
 
   res.json({
     status: 200,
     data: {
       transaction,
       commission,
-      listBonus
+      listBonus,
     },
     message: "",
-    errors: []
+    errors: [],
   });
-}
+};
 
 exports.createRequest = async (req, res) => {
-  console.log('body', req.body);
-  console.log('file', req.file);
-  const io = req.app.get('io');
+  console.log("body", req.body);
+  console.log("file", req.file);
+  const io = req.app.get("io");
   const user_id = req.user_id;
   const { content, reason } = req.body;
   const user = await User.findOne({ _id: user_id }).exec();
@@ -1198,14 +1326,18 @@ exports.createRequest = async (req, res) => {
   if (file) {
     const randomstring = randomString();
 
-    filename = randomstring + '_request.' + file.filename.split('.').pop();
-    fs.rename('./' + file.path, './public/uploads/request/' + filename, (err) => {
-      if (err) console.log(err);
-    });
+    filename = randomstring + "_request." + file.filename.split(".").pop();
+    fs.rename(
+      "./" + file.path,
+      "./public/uploads/request/" + filename,
+      (err) => {
+        if (err) console.log(err);
+      }
+    );
   }
   const request = new Request({
     request_id: user_id,
-    request_time: new Date,
+    request_time: new Date(),
     request_name: user.full_name,
     request_uname: removeAccents(user.full_name.toUpperCase()),
     content,
@@ -1214,56 +1346,43 @@ exports.createRequest = async (req, res) => {
     status: "pending",
     mid: "",
     mtime: "",
-    is_delete: false
+    is_delete: false,
   });
 
   request.save((err) => {
     if (err) {
       console.log(err);
     } else {
-      io.emit('NewRequest');
+      io.emit("NewRequest");
       res.json({
         status: 200,
         errors: [],
         data: {},
-        message: "Yêu cầu của Bạn đã được chúng tôi tiếp nhận và sẽ phản hồi sớm nhất"
+        message:
+          "Yêu cầu của Bạn đã được chúng tôi tiếp nhận và sẽ phản hồi sớm nhất",
       });
     }
-  })
-}
+  });
+};
 
 exports.inviteCode = async (req, res) => {
   const { id, keyword } = req.body;
   const page = parseInt(req.body.page);
   const perPage = parseInt(req.body.resultsPerPage);
 
-
-  var user = await User.findOne({ _id: id }).exec();
-  if (user.buy_package === "1") {
-    return res.json({
-      status: 200,
-      data: {
-        id
-      },
-      message: "",
-      errors: []
-    });
-  }
-  if (user.buy_package === "2" || user.buy_package === "3" || user.buy_package === "4") {
-    let listChildArr = await getInfoFullChildren(id, keyword);
-    return res.json({
-      status: 200,
-      data: {
-        id,
-        listChild: listChildArr.slice((page - 1) * perPage, page * perPage),
-        totalResults: listChildArr.length,
-        allPage: Math.ceil(listChildArr.length / perPage),
-      },
-      message: "",
-      errors: []
-    });
-  }
-}
+  let listChildArr = await getInfoFullChildren(id, keyword);
+  return res.json({
+    status: 200,
+    data: {
+      id,
+      listChild: listChildArr.slice((page - 1) * perPage, page * perPage),
+      totalResults: listChildArr.length,
+      allPage: Math.ceil(listChildArr.length / perPage),
+    },
+    message: "",
+    errors: [],
+  });
+};
 
 const getInfoFullChildren = async (id, keyword) => {
   var kq = [];
@@ -1275,45 +1394,65 @@ const getInfoFullChildren = async (id, keyword) => {
     kq = kq.concat(await getInfoFullChildren(user._id, keyword));
   }
   return kq;
-}
+};
 
 exports.createTransRenew = async (req, res) => {
   console.log("-----------------ok-------------");
   var user_id = req.user_id;
   var datenow = new Date();
-  var checktrans = await Transaction.findOne({ user_id: user_id, status: "pending", is_renew: true }).exec();
+  var checktrans = await Transaction.findOne({
+    user_id: user_id,
+    status: "pending",
+    is_renew: true,
+  }).exec();
   if (checktrans) {
     return res.json({
       status: 404,
       data: {},
       message: "Đã có lệnh gia hạn, vui lòng liên hệ với admin",
-      errors: []
+      errors: [],
     });
   }
   await Transaction.deleteMany({ user_id: user_id, status: "pending" }).exec();
-  var oldTrans = await Transaction.findOne({ user_id: user_id, status: "success" }).sort({ _id: -1 }).exec();
+  var oldTrans = await Transaction.findOne({
+    user_id: user_id,
+    status: "success",
+  })
+    .sort({ _id: -1 })
+    .exec();
   var user = await User.findOne({ _id: user_id }).exec();
   const listPackage = await Package.find().exec();
-  const amount_vnd = listPackage.find((ele) => ele.sid == user.buy_package).price_vnd;
-  const amount_usd = listPackage.find((ele) => ele.sid == user.buy_package).price_usd;
+  const amount_vnd = listPackage.find(
+    (ele) => ele.sid == user.buy_package
+  ).price_vnd;
+  const amount_usd = listPackage.find(
+    (ele) => ele.sid == user.buy_package
+  ).price_usd;
   if (!oldTrans) {
     var newTrans = new Transaction({
       token: "",
-      status: 'pending',
+      status: "pending",
       created_time: datenow,
       user_id: user_id,
       user_name: user.full_name,
       user_uname: removeAccents(user.full_name),
       invite_id: user.parent_id,
-      invite_name: user.parent_id === process.env.INVITE_CODE ? process.env.INVITE_CODE : await User.findOne({ _id: user.parent_id }).exec().full_name,
+      invite_name:
+        user.parent_id === process.env.INVITE_CODE
+          ? process.env.INVITE_CODE
+          : await User.findOne({ _id: user.parent_id }).exec().full_name,
       email: user.email,
       phone: user.phone,
       buy_package: user.buy_package,
       amount_vnd,
       amount_usd,
       is_renew: true,
-      expired_time: new Date(datenow.getFullYear() + 1, datenow.getMonth(), datenow.getDate()),
-      account_type: user.account_type
+      expired_time: new Date(
+        datenow.getFullYear() + 1,
+        datenow.getMonth(),
+        datenow.getDate()
+      ),
+      account_type: user.account_type,
     });
     console.log(newTrans);
     await newTrans.save();
@@ -1321,12 +1460,12 @@ exports.createTransRenew = async (req, res) => {
       status: 200,
       data: { newTrans },
       message: "Success",
-      errors: []
+      errors: [],
     });
   } else {
     var newTrans = new Transaction({
       token: "",
-      status: 'pending',
+      status: "pending",
       created_time: datenow,
       user_id: user_id,
       user_name: user.full_name,
@@ -1339,18 +1478,21 @@ exports.createTransRenew = async (req, res) => {
       amount_vnd,
       amount_usd,
       is_renew: true,
-      expired_time: new Date(datenow.getFullYear() + 1, datenow.getMonth(), datenow.getDate()),
-      account_type: user.account_type
+      expired_time: new Date(
+        datenow.getFullYear() + 1,
+        datenow.getMonth(),
+        datenow.getDate()
+      ),
+      account_type: user.account_type,
     });
     await newTrans.save();
     return res.json({
       status: 200,
       data: {
-        newTrans
+        newTrans,
       },
       message: "Success",
-      errors: []
+      errors: [],
     });
   }
-
-}
+};
