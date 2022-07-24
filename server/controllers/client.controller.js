@@ -368,20 +368,24 @@ exports.dashboardTotalPoint = async (req, res) => {
 
 exports.dashboardCountPackage = async (req, res) => {
   const { id } = req.params;
-  const user = await User.findOne({ _id: id }).exec();
-  var countPackage1 = await countPackage(id, "1");
-  var countPackage2 = await countPackage(id, "2");
-  var countPackage3 = await countPackage(id, "3");
-  var countPackage4 = await countPackage(id, "4");
+  var countPackage1 = 0;
+  var countPackage2 = 0;
+  var countPackage3 = 0;
+  var countPackage4 = 0;
+
+  var kq = {
+    countPackage1,
+    countPackage2,
+    countPackage3,
+    countPackage4,
+  };
+
+  const results = await countPackageV2(id, kq);
+
   res.json({
     status: 200,
     data: {
-      countPackage: {
-        countPackage1,
-        countPackage2,
-        countPackage3,
-        countPackage4,
-      },
+      countPackage: results,
     },
     errors: [],
   });
@@ -484,6 +488,27 @@ const countPackage = async (id, buy_package) => {
   kq = kq + listChildFilter.length;
   for (var ele of listChild) {
     kq = kq + (await countPackage(ele._id, buy_package));
+  }
+  return kq;
+};
+
+const countPackageV2 = async (id, kq) => {
+  let listChild = await User.find({ parent_id: id }).exec();
+
+  for (let ele of listChild) {
+    if (ele.buy_package == "1" && !ele.is_clone) {
+      kq.countPackage1 = kq.countPackage1 + 1;
+    }
+    if (ele.buy_package == "2" && !ele.is_clone) {
+      kq.countPackage2 = kq.countPackage2 + 1;
+    }
+    if (ele.buy_package == "3" && !ele.is_clone) {
+      kq.countPackage3 = kq.countPackage3 + 1;
+    }
+    if (ele.buy_package == "4" && !ele.is_clone) {
+      kq.countPackage4 = kq.countPackage4 + 1;
+    }
+    await countPackageV2(ele._id, kq);
   }
   return kq;
 };

@@ -1,31 +1,20 @@
-import React, { useState, useEffect } from "react";
+import { makeStyles } from "@material-ui/core/styles";
+import Typography from "@material-ui/core/Typography";
+import ChevronRightIcon from "@material-ui/icons/ChevronRight";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import { Skeleton } from "@material-ui/lab";
-import PageTitle from "../components/Typography/PageTitle";
-import "../assets/css/Tree.css";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import TreeItem from "@material-ui/lab/TreeItem";
+import TreeView from "@material-ui/lab/TreeView";
+import { Avatar } from "@windmill/react-ui";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
 import { Tree, TreeNode } from "react-organizational-chart";
 import { toast } from "react-toastify";
+import { TransformComponent, TransformWrapper } from "react-zoom-pan-pinch";
 import CLIENT from "../api/Client";
+import "../assets/css/Tree.css";
+import PageTitle from "../components/Typography/PageTitle";
 import { ArrowIcon } from "../icons";
-import {
-  Table,
-  TableCell,
-  TableBody,
-  TableRow,
-  TableContainer,
-  TableFooter,
-  TableHeader,
-  Avatar,
-} from "@windmill/react-ui";
-import Pagination from "@material-ui/lab/Pagination";
-import TreeView from "@material-ui/lab/TreeView";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ChevronRightIcon from "@material-ui/icons/ChevronRight";
-import TreeItem from "@material-ui/lab/TreeItem";
-import { makeStyles } from "@material-ui/core/styles";
-import { SearchIcon } from "../icons";
-import Typography from "@material-ui/core/Typography";
-import { useTranslation } from "react-i18next";
 
 function TreeHorizon() {
   const { t, i18n } = useTranslation();
@@ -273,32 +262,32 @@ function TreeHorizon() {
       });
   }, [loadTree]);
 
-  useEffect(() => {
-    let message = "Có vấn đề xảy ra! Vui lòng thử lại!";
+  // useEffect(() => {
+  //   let message = "Có vấn đề xảy ra! Vui lòng thử lại!";
 
-    CLIENT.getChildInTree({
-      user_id: id,
-      id: currentSearch,
-      page,
-      resultsPerPage,
-      keyword,
-    })
-      .then((res) => {
-        const status = res.data.status;
-        if (status === 200) {
-          setChilds(res.data.data.listChild);
-          setTotalResults(res.data.data.totalResults);
-          setAllPage(res.data.data.allPage);
-          setLoadingTable(false);
-        } else {
-          toast.error(res.data.message);
-        }
-      })
-      .catch((err) => {
-        console.log(err);
-        toast.error(message);
-      });
-  }, [page, currentSearch, submitted]);
+  //   CLIENT.getChildInTree({
+  //     user_id: id,
+  //     id: currentSearch,
+  //     page,
+  //     resultsPerPage,
+  //     keyword,
+  //   })
+  //     .then((res) => {
+  //       const status = res.data.status;
+  //       if (status === 200) {
+  //         setChilds(res.data.data.listChild);
+  //         setTotalResults(res.data.data.totalResults);
+  //         setAllPage(res.data.data.allPage);
+  //         setLoadingTable(false);
+  //       } else {
+  //         toast.error(res.data.message);
+  //       }
+  //     })
+  //     .catch((err) => {
+  //       console.log(err);
+  //       toast.error(message);
+  //     });
+  // }, [page, currentSearch, submitted]);
 
   async function changeTreeArr(id) {
     if (searchingID.findIndex((ele) => ele === id) === -1) {

@@ -3,7 +3,25 @@ const Transaction = require("../models/transaction.model");
 const Commission = require("../models/commission.model");
 const Tree = require("../models/tree.model");
 const Package = require("../models/package.model");
-const { levelUpMail, thankMail, successMail, randomString, getActiveLink, returnCommission, createCloneBuyPackage3, updateParent, checkLevel, checkPoint, removeAccents, remindRenew1Mail, remindRenew2Mail, renewSuccess, reciveCommissonMail,createCloneBuyPackage4, paymentSuccessMail } = require("./method");
+const {
+  levelUpMail,
+  thankMail,
+  successMail,
+  randomString,
+  getActiveLink,
+  returnCommission,
+  createCloneBuyPackage3,
+  updateParent,
+  checkLevel,
+  checkPoint,
+  removeAccents,
+  remindRenew1Mail,
+  remindRenew2Mail,
+  renewSuccess,
+  reciveCommissonMail,
+  createCloneBuyPackage4,
+  paymentSuccessMail,
+} = require("./method");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -45,10 +63,11 @@ async function processDataActivation(data, token, trans_id, orderId) {
 
   bcrypt.genSalt(saltRounds, function (err, salt) {
     bcrypt.hash(password, salt, async function (err, hash) {
-
       // --------------- CREATE AVATAR -------------------
       const listCharacterOfName = full_name.split(" ");
-      const avatarKey = `${listCharacterOfName[listCharacterOfName.length - 2]}+${listCharacterOfName[listCharacterOfName.length - 1]}`;
+      const avatarKey = `${
+        listCharacterOfName[listCharacterOfName.length - 2]
+      }+${listCharacterOfName[listCharacterOfName.length - 1]}`;
 
       // --------------- SAVE USER -------------------
       var level = 0;
@@ -70,7 +89,11 @@ async function processDataActivation(data, token, trans_id, orderId) {
       }
       let now = new Date();
       let datenow = new Date().setHours(0, 0, 0, 0);
-      let expired = new Date(now.getFullYear() + 1, now.getMonth(), now.getDate()).setHours(0, 0, 0, 0);
+      let expired = new Date(
+        now.getFullYear() + 1,
+        now.getMonth(),
+        now.getDate()
+      ).setHours(0, 0, 0, 0);
 
       const user = new User({
         full_name: full_name.toUpperCase(),
@@ -106,12 +129,12 @@ async function processDataActivation(data, token, trans_id, orderId) {
         ss,
         request_commission,
         drive_id,
-        invite_user_id: invite_code
+        invite_user_id: invite_code,
       });
 
       await user.save();
       if (user.level !== 0) {
-        await levelUpMail(user._id)
+        await levelUpMail(user._id);
       }
 
       // --------------- FIND DONATE USER -------------------
@@ -134,18 +157,19 @@ async function processDataActivation(data, token, trans_id, orderId) {
             { parent: userOfDonateSales._id },
             {
               $push: { group2: user._id },
-            }).exec();
+            }
+          ).exec();
         } else if (group_number === "3") {
           await Tree.findOneAndUpdate(
             { parent: userOfDonateSales._id },
             {
               $push: { group3: user._id },
-            }).exec();
+            }
+          ).exec();
         } else {
           console.log("thêm id vào cha thất bại");
         }
       }
-
 
       // --------------- SAVE TREE -------------------
       const newTree = new Tree({
@@ -153,13 +177,10 @@ async function processDataActivation(data, token, trans_id, orderId) {
         buy_package,
       });
 
-
       await newTree.save();
 
       const oneYearFromNow = new Date();
-      oneYearFromNow.setFullYear(
-        oneYearFromNow.getFullYear() + 1
-      );
+      oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
       // --------------- SAVE COMMISSTIONS -------------------
       if (invite_code !== process.env.INVITE_CODE) {
@@ -193,12 +214,7 @@ async function processDataActivation(data, token, trans_id, orderId) {
       }
 
       // --------------- GET APP ACTIVATIONS LINKS -------------------
-      const links = await getActiveLink(
-        email,
-        full_name,
-        phone,
-        buy_package
-      );
+      const links = await getActiveLink(email, full_name, phone, buy_package);
 
       if (links.length === 0) {
         console.log(`Lấy link active thất bại! Vui lòng thử lại sau`);
@@ -206,25 +222,27 @@ async function processDataActivation(data, token, trans_id, orderId) {
       }
 
       // --------------- SEND SUCCESS MAIL -------------------
-      await paymentSuccessMail(
-        user._id,
-        links
-      );
+      await paymentSuccessMail(user._id, links);
 
       // --------------- SEND THANKS MAIL -------------------
       if (invite_code !== process.env.INVITE_CODE) {
         const userOfInvite = await User.findOne({
           _id: invite_code,
         }).exec();
-        await reciveCommissonMail(
-          user._id
-        );
+        await reciveCommissonMail(user._id);
       }
 
       // --------------- RESET TOKEN TO EMPTY -------------------
       await Transaction.findOneAndUpdate(
         { token },
-        { token: "", user_id: user._id, status: "success", orderId, approved_by: 'ADMIN', approved_time: new Date }
+        {
+          token: "",
+          user_id: user._id,
+          status: "success",
+          orderId,
+          approved_by: "ADMIN",
+          approved_time: new Date(),
+        }
       );
 
       // --------------- CONSOLE.LOG ERROR FIELD -------------------
@@ -237,7 +255,9 @@ exports.activeTrans = async (req, res) => {
   const admin_id = req.admin_id;
   const id = req.params.id;
 
-  const trans = await Transaction.findOne({ $and: [{ _id: id }, { status: 'pending' }] }).exec();
+  const trans = await Transaction.findOne({
+    $and: [{ _id: id }, { status: "pending" }],
+  }).exec();
 
   const { token } = trans;
 
@@ -258,15 +278,21 @@ exports.activeTrans = async (req, res) => {
           } else {
             await processDataActivation(jwt.decode(token), token, trans._id);
           }
-        });
-      await Transaction.findOneAndUpdate({ _id: id }, { status: "processing" }).exec();
+        }
+      );
+      await Transaction.findOneAndUpdate(
+        { _id: id },
+        { status: "processing" }
+      ).exec();
     }
-    const count = await Transaction.countDocuments({ status: "pending" }).sort().exec();
+    const count = await Transaction.countDocuments({ status: "pending" })
+      .sort()
+      .exec();
     res.json({
       status: 200,
       message: "Kích hoạt thành công",
       data: {
-        count: count - 1
+        count: count - 1,
       },
       errors: [],
     });
@@ -291,39 +317,39 @@ exports.changePaymentMethod = async (req, res) => {
       data: {},
       errors: [],
     });
-  }
-  else {
+  } else {
     return res.json({
       status: 404,
       message: "Không tìm thấy giao dịch",
       errors: [],
     });
   }
-}
+};
 
 exports.deleteTrans = async (req, res) => {
   const id = req.body.id;
   const trans = await Transaction.findOne({ _id: id }).exec();
   Transaction.deleteOne({
-    $and:
-      [{
+    $and: [
+      {
         _id: id,
         status: "pending",
-      }]
+      },
+    ],
   }).exec();
   return res.json({
     status: 200,
     message: "Đã xóa giao dịch",
     errors: [],
   });
-}
+};
 
 exports.getTransList = async (req, res) => {
   const keyword = req.body.keyword ? req.body.keyword : "";
   const status = req.body.currentTable;
   const page = parseInt(req.body.page);
   const searchLevel = req.body.searchLevel;
-  const perPage = parseInt(req.body.perPage);
+  const perPage = parseInt(req.body.resultsPerPage);
   const searchType = parseInt(req.body.searchType);
   const changeListExport = req.body.changeListExport;
   var listTrans = [];
@@ -332,36 +358,41 @@ exports.getTransList = async (req, res) => {
   switch (searchType) {
     case 1:
       listTrans = await Transaction.find({
-        $and: [{
-          status,
-          "user_uname": { $regex: '.*' + removeAccents(keyword.toUpperCase()) + '.*', $options: 'i' }
-        },
-        { is_delete: false }
-        ]
-      }).sort({ _id: -1 }).limit(perPage).skip(perPage * (page - 1)).exec();
+        $and: [
+          {
+            status,
+            user_uname: {
+              $regex: ".*" + removeAccents(keyword.toUpperCase()) + ".*",
+              $options: "i",
+            },
+          },
+          { is_delete: false },
+        ],
+      })
+        .sort({ _id: -1 })
+        .limit(perPage)
+        .skip(perPage * (page - 1))
+        .exec();
       countAllDocument = await Transaction.countDocuments({
-        $and: [{
-          status,
-          "user_name": { $regex: '.*' + keyword + '.*', $options: 'i' }
-        },
-        { is_delete: false }]
+        $and: [
+          {
+            status,
+            user_name: { $regex: ".*" + keyword + ".*", $options: "i" },
+          },
+          { is_delete: false },
+        ],
       }).exec();
       break;
     case 2:
       listTrans = await Transaction.find({
-        $and: [
-          { status },
-          { "buy_package": searchLevel },
-          { is_delete: false }
-
-        ]
-      }).sort({ _id: -1 }).limit(perPage).skip(perPage * (page - 1)).exec();
+        $and: [{ status }, { buy_package: searchLevel }, { is_delete: false }],
+      })
+        .sort({ _id: -1 })
+        .limit(perPage)
+        .skip(perPage * (page - 1))
+        .exec();
       countAllDocument = await Transaction.countDocuments({
-        $and: [
-          { status },
-          { "buy_package": searchLevel },
-          { is_delete: false }
-        ]
+        $and: [{ status }, { buy_package: searchLevel }, { is_delete: false }],
       }).exec();
       break;
   }
@@ -370,21 +401,27 @@ exports.getTransList = async (req, res) => {
     switch (searchType) {
       case 1:
         exportData = await Transaction.find({
-          $and: [{
-            status,
-            "user_name": { $regex: '.*' + keyword + '.*', $options: 'i' }
-          },
-          { is_delete: false }]
-        }).sort({ _id: -1 }).exec();
+          $and: [
+            {
+              status,
+              user_name: { $regex: ".*" + keyword + ".*", $options: "i" },
+            },
+            { is_delete: false },
+          ],
+        })
+          .sort({ _id: -1 })
+          .exec();
         break;
       case 2:
         exportData = await Transaction.find({
           $and: [
             { status },
-            { "buy_package": searchLevel },
-            { is_delete: false }
-          ]
-        }).sort({ _id: -1 }).exec();
+            { buy_package: searchLevel },
+            { is_delete: false },
+          ],
+        })
+          .sort({ _id: -1 })
+          .exec();
         break;
     }
   }
@@ -394,7 +431,7 @@ exports.getTransList = async (req, res) => {
       listTrans,
       allPage: Math.ceil(countAllDocument / perPage),
       countAllDocument,
-      exportData
+      exportData,
     },
     message: "",
     errors: [],
@@ -403,20 +440,39 @@ exports.getTransList = async (req, res) => {
 
 const changeStatus = async (id) => {
   var trans = await Transaction.findOne({ _id: id }).exec();
-  var commissOld = await Commission.findOne({ join_mem_id: trans.user_id }).sort({ _id: -1 }).exec();
+  var commissOld = await Commission.findOne({ join_mem_id: trans.user_id })
+    .sort({ _id: -1 })
+    .exec();
   var user = await User.findOne({ _id: trans.user_id }).exec();
   var date = new Date(user.expire_time);
-  await User.findOneAndUpdate({ _id: trans.user_id }, { expire_time: new Date(date.getFullYear() + 1, date.getMonth(), date.getDate()), renew_date: new Date(), count_renew: user.count_renew + 1, active: true }).exec();
+  await User.findOneAndUpdate(
+    { _id: trans.user_id },
+    {
+      expire_time: new Date(
+        date.getFullYear() + 1,
+        date.getMonth(),
+        date.getDate()
+      ),
+      renew_date: new Date(),
+      count_renew: user.count_renew + 1,
+      active: true,
+    }
+  ).exec();
   if (user.buy_package === "3" || user.buy_package === "4") {
     await User.updateMany(
       { $and: [{ parent_id: user._id }, { is_clone: true }] },
       {
-        expire_time: new Date(date.getFullYear() + 1, date.getMonth(), date.getDate()),
+        expire_time: new Date(
+          date.getFullYear() + 1,
+          date.getMonth(),
+          date.getDate()
+        ),
         renew_date: new Date(),
         count_renew: user.count_renew + 1,
         expired: false,
-        active: true
-      }).exec();
+        active: true,
+      }
+    ).exec();
   }
   const listPackage = await Package.find().exec();
   const package = listPackage.find((ele) => ele.sid == user.buy_package);
@@ -447,27 +503,35 @@ const changeStatus = async (id) => {
           join_mem_id: trans.join_mem_id,
           receive_mem_id: parent._id,
           join_mem_name: user.full_name,
-          receive_mem_uname: user.parent_id === process.env.INVITE_CODE ? process.env.INVITE_CODE : removeAccents(parent.full_name),
+          receive_mem_uname:
+            user.parent_id === process.env.INVITE_CODE
+              ? process.env.INVITE_CODE
+              : removeAccents(parent.full_name),
           join_mem_uname: removeAccents(user.full_name),
-          receive_mem_name: user.parent_id === process.env.INVITE_CODE ? process.env.INVITE_CODE : parent.full_name,
-          status: 'pending',
+          receive_mem_name:
+            user.parent_id === process.env.INVITE_CODE
+              ? process.env.INVITE_CODE
+              : parent.full_name,
+          status: "pending",
           created_time: new Date(),
           amount_vnd,
           amount_usd,
-          bank_account: user.parent_id === process.env.INVITE_CODE ? "" : parent.bank_account,
+          bank_account:
+            user.parent_id === process.env.INVITE_CODE
+              ? ""
+              : parent.bank_account,
           bank: user.parent_id === process.env.INVITE_CODE ? "" : parent.bank,
-          bank_name: user.parent_id === process.env.INVITE_CODE ? "" : parent.bank_name,
+          bank_name:
+            user.parent_id === process.env.INVITE_CODE ? "" : parent.bank_name,
           buy_package: user.buy_package,
-          is_renew: true
+          is_renew: true,
         });
         await commissNew.save();
       }
     }
-  }
-  else {
+  } else {
     var parent = await User.findOne({ _id: commissOld.receive_mem_id }).exec();
     if (parent) {
-
       let amount_vnd = 0;
       let amount_usd = 0;
       if (parent.buy_package == 1) {
@@ -494,7 +558,7 @@ const changeStatus = async (id) => {
         receive_mem_name: parent.full_name,
         receive_mem_uname: removeAccents(parent.full_name),
         join_mem_uname: removeAccents(commissOld.receive_mem_name),
-        status: 'pending',
+        status: "pending",
         created_time: new Date(),
         amount_vnd,
         amount_usd,
@@ -502,14 +566,16 @@ const changeStatus = async (id) => {
         bank: parent.bank,
         bank_name: parent.bank_name,
         buy_package: commissOld.buy_package,
-        is_renew: true
+        is_renew: true,
       });
       await commissNew.save();
     }
-
   }
   await checkPoint(user._id);
   await checkPoint(user.parent_id);
-  await Transaction.findOneAndUpdate({ _id: trans._id }, { status: 'success', approved_time: new Date(), approved_by: 'ADMIN' }).exec();
+  await Transaction.findOneAndUpdate(
+    { _id: trans._id },
+    { status: "success", approved_time: new Date(), approved_by: "ADMIN" }
+  ).exec();
   await renewSuccess(user._id);
-}
+};

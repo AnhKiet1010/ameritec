@@ -12,7 +12,7 @@ import {
   SimpleClockIcon,
   MusclesIcon,
   PeopleIcon,
-  FormsIcon
+  FormsIcon,
 } from "../../icons";
 import RoundIcon from "../../components/RoundIcon";
 import ADMIN from "../../api/Admin";
@@ -27,16 +27,16 @@ import {
   TableHeader,
   TableCell,
   TableRow,
-  Button
+  Button,
 } from "@windmill/react-ui";
-import { Doughnut } from 'react-chartjs-2';
-import ChartCard from '../../components/Chart/ChartCard';
-import ChartLegend from '../../components/Chart/ChartLegend';
+import { Doughnut } from "react-chartjs-2";
+import ChartCard from "../../components/Chart/ChartCard";
+import ChartLegend from "../../components/Chart/ChartLegend";
 import ExportUsersData from "../../components/ExportData/usersProfile";
-import AdminUpdateProfilePopup from '../../components/AdminUpdateProfilePopup';
+import AdminUpdateProfilePopup from "../../components/AdminUpdateProfilePopup";
 
 function UserProfile({ match }) {
-  const admin = JSON.parse(localStorage.getItem('user')).user;
+  const admin = JSON.parse(localStorage.getItem("user")).user;
   const id = match.params.id;
   const [loading, setLoading] = useState(true);
   const [dataTable, setDataTable] = useState([]);
@@ -72,7 +72,7 @@ function UserProfile({ match }) {
     textAreaRef1.current.select();
     document.execCommand("copy");
     e.target.focus();
-    toast.success("Đã copy!")
+    toast.success("Đã copy!");
   }
 
   const textAreaRef2 = useRef(null);
@@ -81,7 +81,7 @@ function UserProfile({ match }) {
     textAreaRef2.current.select();
     document.execCommand("copy");
     e.target.focus();
-    toast.success("Đã copy!")
+    toast.success("Đã copy!");
   }
 
   const textAreaRef3 = useRef(null);
@@ -90,39 +90,42 @@ function UserProfile({ match }) {
     textAreaRef3.current.select();
     document.execCommand("copy");
     e.target.focus();
-    toast.success("Đã copy!")
+    toast.success("Đã copy!");
   }
 
   useEffect(() => {
-    const buy_package = JSON.parse(localStorage.getItem("user")).user.buy_package;
+    const buy_package = JSON.parse(localStorage.getItem("user")).user
+      .buy_package;
 
-    if (buy_package !== "1") {
-      CLIENT.dashboardTotalPoint(id)
-        .then((res) => {
-          const status = res.data.status;
-          if (status === 200) {
-            setTargetNumber(res.data.data.targetNumber);
-            setTotalPointGroup1(res.data.data.sumPoint.sumPointGroup1);
-            setTotalPointGroup2(res.data.data.sumPoint.sumPointGroup2);
-            setTotalPointGroup3(res.data.data.sumPoint.sumPointGroup3);
-            setTotalPerGroup1(res.data.data.perGroup.perGroup1);
-            setTotalPerGroup2(res.data.data.perGroup.perGroup2);
-            setTotalPerGroup3(res.data.data.perGroup.perGroup3);
-            setTryTarget(res.data.data.targetNumber - res.data.data.sumPoint.sumPointGroup1 - res.data.data.sumPoint.sumPointGroup2 - res.data.data.sumPoint.sumPointGroup3);
-            setLoadingTotalPoint(false);
-          } else {
-            toast.error(res.data.message);
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-          toast.error("Có lỗi xảy ra! Vui lòng đăng nhập lại!");
-        });
-    }
+    CLIENT.dashboardTotalPoint(id)
+      .then((res) => {
+        const status = res.data.status;
+        if (status === 200) {
+          setTargetNumber(res.data.data.targetNumber);
+          setTotalPointGroup1(res.data.data.sumPoint.sumPointGroup1);
+          setTotalPointGroup2(res.data.data.sumPoint.sumPointGroup2);
+          setTotalPointGroup3(res.data.data.sumPoint.sumPointGroup3);
+          setTotalPerGroup1(res.data.data.perGroup.perGroup1);
+          setTotalPerGroup2(res.data.data.perGroup.perGroup2);
+          setTotalPerGroup3(res.data.data.perGroup.perGroup3);
+          setTryTarget(
+            res.data.data.targetNumber -
+              res.data.data.sumPoint.sumPointGroup1 -
+              res.data.data.sumPoint.sumPointGroup2 -
+              res.data.data.sumPoint.sumPointGroup3
+          );
+          setLoadingTotalPoint(false);
+        } else {
+          toast.error(res.data.message);
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+        toast.error("Có lỗi xảy ra! Vui lòng đăng nhập lại!");
+      });
 
     CLIENT.dashboardCountPackage(id)
       .then((res) => {
-        console.log('data count', res.data);
         const status = res.data.status;
         if (status === 200) {
           setTotalPersonPackage(res.data.data.countPackage.countPackage1);
@@ -143,9 +146,7 @@ function UserProfile({ match }) {
       .then((res) => {
         const status = res.data.status;
         if (status === 200) {
-          const {
-            user
-          } = res.data.data;
+          const { user } = res.data.data;
           setUser(user);
           setDayToExpired(res.data.data.dayToExpired + 1);
           setExpiredTime(res.data.data.expired_time);
@@ -160,7 +161,6 @@ function UserProfile({ match }) {
         console.log(err);
         toast.error("Có lỗi xảy ra! Vui lòng đăng nhập lại!");
       });
-
   }, [refresh]);
 
   useEffect(() => {
@@ -183,12 +183,17 @@ function UserProfile({ match }) {
       });
   }, [change, refresh]);
 
-
   function onClickEdit() {
     confirmAlert({
       customUI: ({ onClose }) => {
         return (
-          <AdminUpdateProfilePopup userData={userData} id={id} onClose={onClose} setRefresh={setRefresh} refresh={refresh} />
+          <AdminUpdateProfilePopup
+            userData={userData}
+            id={id}
+            onClose={onClose}
+            setRefresh={setRefresh}
+            refresh={refresh}
+          />
         );
       },
     });
@@ -198,33 +203,41 @@ function UserProfile({ match }) {
     data: {
       datasets: [
         {
-          data: [Math.round(totalPerGroup1), Math.round(totalPerGroup2), Math.round(totalPerGroup3), 100 - Math.round(totalPerGroup1) - Math.round(totalPerGroup2) - Math.round(totalPerGroup3)],
+          data: [
+            Math.round(totalPerGroup1),
+            Math.round(totalPerGroup2),
+            Math.round(totalPerGroup3),
+            100 -
+              Math.round(totalPerGroup1) -
+              Math.round(totalPerGroup2) -
+              Math.round(totalPerGroup3),
+          ],
           /**
            * These colors come from Tailwind CSS palette
            * https://tailwindcss.com/docs/customizing-colors/#default-color-palette
            */
-          backgroundColor: ['#10B981', '#3B82F6', '#F97316', '#000'],
-          label: 'Tỷ lệ cấp dưới theo nhóm',
+          backgroundColor: ["#10B981", "#3B82F6", "#F97316", "#000"],
+          label: "Tỷ lệ cấp dưới theo nhóm",
         },
       ],
-      labels: ['Nhóm 1', 'Nhóm 2', 'Nhóm 3', 'Cần cố gắng'],
+      labels: ["Nhóm 1", "Nhóm 2", "Nhóm 3", "Cần cố gắng"],
     },
     options: {
       responsive: true,
       cutoutPercentage: 80,
-      width: 'auto',
-      height: 'auto'
+      width: "auto",
+      height: "auto",
     },
     legend: {
       display: false,
     },
-  }
+  };
 
   const doughnutLegends = [
-    { title: 'Nhóm 1', color: 'bg-green-500' },
-    { title: 'Nhóm 2', color: 'bg-blue-500' },
-    { title: 'Nhóm 3', color: 'bg-orange-500' },
-    { title: 'Cần cố gắng', color: 'bg-black' },
+    { title: "Nhóm 1", color: "bg-green-500" },
+    { title: "Nhóm 2", color: "bg-blue-500" },
+    { title: "Nhóm 3", color: "bg-orange-500" },
+    { title: "Cần cố gắng", color: "bg-black" },
   ];
 
   const handleRenewClick = () => {
@@ -244,11 +257,14 @@ function UserProfile({ match }) {
         console.log(err);
         toast.error("Có lỗi xảy ra! Vui lòng đăng nhập lại!");
       });
-  }
+  };
 
   return (
     <>
-      <PageTitle>Thông tin khách hàng : <span className="text-gray-700 italic">{userData.full_name}</span></PageTitle>
+      <PageTitle>
+        Thông tin khách hàng :{" "}
+        <span className="text-gray-700 italic">{userData.full_name}</span>
+      </PageTitle>
 
       <CTA back_url="/admin/users" />
       {/* <!-- Cards --> */}
@@ -281,48 +297,52 @@ function UserProfile({ match }) {
 
         {loadingUserInfo ? (
           <Skeleton variant="rect" width="100%" height={100} />
-        ) : (<>
-          {
-            userData.buy_package !== "1" ?
-              <InfoCard title="Level" value={user.level}>
-                <RoundIcon
-                  icon={LevelIcon}
-                  iconColorClass="text-teal-500 dark:text-teal-100"
-                  bgColorClass="bg-teal-100 dark:bg-teal-500"
-                  className="mr-4"
-                />
-              </InfoCard>
-              : <InfoCard title="Gói cá nhân" value={totalPersonPackage}>
-                <RoundIcon
-                  icon={PeopleIcon}
-                  iconColorClass="text-green-500 dark:text-green-100"
-                  bgColorClass="bg-green-100 dark:bg-green-500"
-                  className="mr-4"
-                />
-              </InfoCard>
-          }
-        </>
+        ) : (
+          <>
+            <InfoCard title="Level" value={user.level}>
+              <RoundIcon
+                icon={LevelIcon}
+                iconColorClass="text-teal-500 dark:text-teal-100"
+                bgColorClass="bg-teal-100 dark:bg-teal-500"
+                className="mr-4"
+              />
+            </InfoCard>
+          </>
         )}
 
         {loadingUserInfo ? (
           <Skeleton variant="rect" width="100%" height={100} />
-        ) : <div className={`min-w-0 rounded-lg shadow-xs overflow-hidden ${dayToExpired <= 7 ? "bg-red-500 text-white" : "bg-white text-gray-600"} flex justify-between items-center`}>
-          <div className="p-4 flex items-center justify-between mb-2">
-            <div>
-              <div className=" text-sm font-medium">Ngày đăng ký : <span className="text-lg">
-                {new Date(createdTime).toLocaleDateString("vi")}
-              </span></div>
-              <div className=" text-sm font-medium">Ngày hết hạn : <span className="text-lg">
-                {expiredTime ? new Date(expiredTime).toLocaleDateString("vi") : ""}
-              </span>
+        ) : (
+          <div
+            className={`min-w-0 rounded-lg shadow-xs overflow-hidden ${
+              dayToExpired <= 7
+                ? "bg-red-500 text-white"
+                : "bg-white text-gray-600"
+            } flex justify-between items-center`}
+          >
+            <div className="p-4 flex items-center justify-between mb-2">
+              <div>
+                <div className=" text-sm font-medium">
+                  Ngày đăng ký :{" "}
+                  <span className="text-lg">
+                    {new Date(createdTime).toLocaleDateString("vi")}
+                  </span>
+                </div>
+                <div className=" text-sm font-medium">
+                  Ngày hết hạn :{" "}
+                  <span className="text-lg">
+                    {expiredTime
+                      ? new Date(expiredTime).toLocaleDateString("vi")
+                      : ""}
+                  </span>
+                </div>
               </div>
             </div>
           </div>
-        </div>
-        }
+        )}
       </div>
 
-      {userData.buy_package !== "1" && <>
+      <>
         {loadingUserInfo ? (
           <Skeleton variant="rect" width="100%" height={60} />
         ) : (
@@ -336,16 +356,23 @@ function UserProfile({ match }) {
         <div className="w-1/2 mb-4">
           <div>
             <PageTitle>Tỷ lệ cấp dưới theo nhóm (%)</PageTitle>
-            {
-              loadingTotalPoint ?
-                <>
-                  <div className=""><Skeleton variant="rect" width="100%" height={400} count={1} /></div>
-                </> :
-                <ChartCard title="">
-                  <Doughnut {...doughnutOptions} />
-                  <ChartLegend legends={doughnutLegends} />
-                </ChartCard>
-            }
+            {loadingTotalPoint ? (
+              <>
+                <div className="">
+                  <Skeleton
+                    variant="rect"
+                    width="100%"
+                    height={400}
+                    count={1}
+                  />
+                </div>
+              </>
+            ) : (
+              <ChartCard title="">
+                <Doughnut {...doughnutOptions} />
+                <ChartLegend legends={doughnutLegends} />
+              </ChartCard>
+            )}
           </div>
         </div>
 
@@ -368,7 +395,9 @@ function UserProfile({ match }) {
           ) : (
             <InfoCard
               title="Số điểm đã đạt được"
-              value={`${totalPointGroup1 + totalPointGroup2 + totalPointGroup3}`}
+              value={`${
+                totalPointGroup1 + totalPointGroup2 + totalPointGroup3
+              }`}
             >
               <RoundIcon
                 icon={SimpleClockIcon}
@@ -446,36 +475,35 @@ function UserProfile({ match }) {
           )}
         </div>
       </>
-      }
+
       <div className="flex items-center justify-between space-x-4 mb-6">
-        {
-  admin.role === 'admin' &&
+        {admin.role === "admin" && (
           <button
             onClick={onClickEdit}
             className="inline-block mx-2 px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-red-500 rounded-full shadow ripple hover:shadow-lg hover:bg-red-600 focus:outline-none disabled:opacity-50"
           >
             Thay đổi thông tin
           </button>
-        }
-        {
-          admin.role === 'admin' &&
+        )}
+        {admin.role === "admin" && (
           <>
-            {
-              dayToExpired <= 7 &&
-              <button onClick={handleRenewClick} className={`inline-block mx-2 px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-orange-500 rounded-full shadow ripple hover:shadow-lg hover:bg-orange-600 focus:outline-none disabled:opacity-50`}>
+            {dayToExpired <= 7 && (
+              <button
+                onClick={handleRenewClick}
+                className={`inline-block mx-2 px-6 py-2 text-xs font-medium leading-6 text-center text-white uppercase transition bg-orange-500 rounded-full shadow ripple hover:shadow-lg hover:bg-orange-600 focus:outline-none disabled:opacity-50`}
+              >
                 {submittingRenew ? (
                   <span className="text-white">Đang xử lí gia hạn</span>
                 ) : (
                   "Gia Hạn Tài Khoản"
                 )}
               </button>
-            }
+            )}
           </>
-        }
-        {
-          admin.role !== 'accountant2' &&
+        )}
+        {admin.role !== "accountant2" && (
           <ExportUsersData id={id} user={user} />
-        }
+        )}
       </div>
       {loading ? (
         <Skeleton variant="rect" width="100%" height="50px" count="8" />
@@ -490,88 +518,126 @@ function UserProfile({ match }) {
               </tr>
             </TableHeader>
             <TableBody>
-              {dataTable.map((proper, i) => (
-                (proper.label === "cmndMT" || proper.label === "cmndMS") ?
+              {dataTable.map((proper, i) =>
+                proper.label === "cmndMT" || proper.label === "cmndMS" ? (
                   <TableRow key={i}>
                     <TableCell>
                       <span className="text-sm">{proper.label}</span>
                     </TableCell>
                     <TableCell colSpan={2}>
-                      {
-                        proper.value ?
-                          <img src={`${process.env.REACT_APP_API_URL}/uploads/cmnd/${proper.value}`} width="50%" alt="CMND" />
-                          : <div className="text-sm text-gray-400 text-left">chưa cập nhật</div>
-                      }
+                      {proper.value ? (
+                        <img
+                          src={`${process.env.REACT_APP_API_URL}/uploads/cmnd/${proper.value}`}
+                          width="50%"
+                          alt="CMND"
+                        />
+                      ) : (
+                        <div className="text-sm text-gray-400 text-left">
+                          chưa cập nhật
+                        </div>
+                      )}
                     </TableCell>
                   </TableRow>
-                  :
+                ) : (
                   <TableRow key={i}>
                     <TableCell>
                       <span className="text-sm">{proper.label}</span>
                     </TableCell>
-                    {
-                      proper.label === "Link giới thiệu nhóm 1" &&
+                    {proper.label === "Link giới thiệu nhóm 1" && (
                       <TableCell>
-                        <input className="text-sm w-full" onChange={() => { }} ref={textAreaRef1} value={proper.value} />
+                        <input
+                          className="text-sm w-full"
+                          onChange={() => {}}
+                          ref={textAreaRef1}
+                          value={proper.value}
+                        />
                       </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu nhóm 2" &&
+                    )}
+                    {proper.label === "Link giới thiệu nhóm 2" && (
                       <TableCell>
-                        <input className="text-sm w-full" onChange={() => { }} ref={textAreaRef2} value={proper.value} />
+                        <input
+                          className="text-sm w-full"
+                          onChange={() => {}}
+                          ref={textAreaRef2}
+                          value={proper.value}
+                        />
                       </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu nhóm 3" &&
+                    )}
+                    {proper.label === "Link giới thiệu nhóm 3" && (
                       <TableCell>
-                        <input className="text-sm w-full" onChange={() => { }} ref={textAreaRef3} value={proper.value} />
+                        <input
+                          className="text-sm w-full"
+                          onChange={() => {}}
+                          ref={textAreaRef3}
+                          value={proper.value}
+                        />
                       </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu" &&
+                    )}
+                    {proper.label === "Link giới thiệu" && (
                       <TableCell>
-                        <input className="text-sm w-full" onChange={() => { }} ref={textAreaRef1} value={`${proper.value}/1`} />
+                        <input
+                          className="text-sm w-full"
+                          onChange={() => {}}
+                          ref={textAreaRef1}
+                          value={`${proper.value}/1`}
+                        />
                       </TableCell>
-                    }
-                    {(proper.label !== "Link giới thiệu nhóm 1" && proper.label !== "Link giới thiệu" && proper.label !== "Link giới thiệu nhóm 2" && proper.label !== "Link giới thiệu nhóm 3") &&
-                      <TableCell colSpan={2}>
-                        <span className="text-sm">{proper.value}</span>
-                      </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu" &&
+                    )}
+                    {proper.label !== "Link giới thiệu nhóm 1" &&
+                      proper.label !== "Link giới thiệu" &&
+                      proper.label !== "Link giới thiệu nhóm 2" &&
+                      proper.label !== "Link giới thiệu nhóm 3" && (
+                        <TableCell colSpan={2}>
+                          <span className="text-sm">{proper.value}</span>
+                        </TableCell>
+                      )}
+                    {proper.label === "Link giới thiệu" && (
                       <TableCell>
-                        <Button onClick={(e) => {
-                          copyToClipboard1(e);
-                        }} >Copy</Button>
+                        <Button
+                          onClick={(e) => {
+                            copyToClipboard1(e);
+                          }}
+                        >
+                          Copy
+                        </Button>
                       </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu nhóm 1" &&
+                    )}
+                    {proper.label === "Link giới thiệu nhóm 1" && (
                       <TableCell>
-                        <Button onClick={(e) => {
-                          copyToClipboard1(e);
-                        }} >Copy</Button>
+                        <Button
+                          onClick={(e) => {
+                            copyToClipboard1(e);
+                          }}
+                        >
+                          Copy
+                        </Button>
                       </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu nhóm 2" &&
+                    )}
+                    {proper.label === "Link giới thiệu nhóm 2" && (
                       <TableCell>
-                        <Button onClick={(e) => {
-                          copyToClipboard2(e);
-                        }} >Copy</Button>
+                        <Button
+                          onClick={(e) => {
+                            copyToClipboard2(e);
+                          }}
+                        >
+                          Copy
+                        </Button>
                       </TableCell>
-                    }
-                    {
-                      proper.label === "Link giới thiệu nhóm 3" &&
+                    )}
+                    {proper.label === "Link giới thiệu nhóm 3" && (
                       <TableCell>
-                        <Button onClick={(e) => {
-                          copyToClipboard3(e);
-                        }} >Copy</Button>
+                        <Button
+                          onClick={(e) => {
+                            copyToClipboard3(e);
+                          }}
+                        >
+                          Copy
+                        </Button>
                       </TableCell>
-                    }
+                    )}
                   </TableRow>
-              ))}
+                )
+              )}
             </TableBody>
           </Table>
         </TableContainer>
