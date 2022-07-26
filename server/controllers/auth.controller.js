@@ -177,7 +177,7 @@ exports.registerController = async (req, res) => {
     request_commission,
     drive_id,
   } = req.body;
-
+console.log("check");
   const user_repeat_email = await User.findOne({ email }).exec();
 
   await Transaction.deleteMany({ email, status: "pending" }).exec();

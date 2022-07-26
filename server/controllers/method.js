@@ -281,9 +281,7 @@ const checkLevel = async (id) => {
   var count_check3 = await User.countDocuments({ $and: [{ _id: { $in: tree.group3 } }, { buy_package: { $ne: "1" } }, { expired: false }] }).exec();
   console.log(user.full_name + "count_check", count_check1 + "/" + count_check2 + "/" + count_check3);
   switch (user.buy_package) {
-    case "1":
-
-      break;
+    
     case "2":
     case "3":
       if (count_check1 >= 1 && count_check2 >= 1 && count_check3 >= 1 && count_check1 + count_check2 + count_check3 > 8) {
@@ -380,6 +378,7 @@ const checkLevel = async (id) => {
         await checkLevel(user.parent_id);
       }
       break;
+    case "1":
     case "4":
       console.log(user.full_name + " check");
       if (count_check1 >= 1 && count_check2 >= 1 && count_check3 >= 1) {
@@ -487,10 +486,10 @@ const checkLevel = async (id) => {
 }
 
 
-exports.checkChildPoint = async(id)=>{
-  return await checkChildPoint(id);
+exports.checkChildPoint = async(id,flag_parent=true)=>{
+  return await checkChildPoint(id,flag_parent);
 }
-const checkChildPoint = async (id)=>{
+const checkChildPoint = async (id,flag_parent=true)=>{
   try{
     if (id && id !== process.env.INVITE_CODE) {
       var user = await User.findOne({ _id: id }).exec();
@@ -567,8 +566,11 @@ const checkChildPoint = async (id)=>{
   
     if(flag){
       await user.save();
-      console.log("Update success: ",user.id)
-      checkChildPoint(user.parent_id);
+      console.log("Update success: ",user.id);
+      if(flag_parent==true){
+        await checkChildPoint(user.parent_id);
+      }
+      
       return 2;
     }
     
@@ -2361,7 +2363,7 @@ exports.paymentSuccessMail = async (id, links) => {
       }
       if (user.is_partner === true) {
         stringref = stringref + "<ul>";
-        if (user.buy_package !== "1") {
+        if (user.buy_package !== "0") {
           for (var i = 1; i < 4; i++) {
             stringref = stringref + "<li>Nhóm " + i + ": " + process.env.CLIENT_URL + "/referral/" + user._id + "/" + i + "</li>"
           }
@@ -2396,7 +2398,7 @@ exports.paymentSuccessMail = async (id, links) => {
         // stringref = stringref + "<p>Here is your Affiliate referral link:</p><ul>";
         stringref = stringref + "<ul>";
 
-        if (user.buy_package !== "1") {
+        if (user.buy_package !== "0") {
           for (var i = 1; i < 4; i++) {
             stringref = stringref + "<li>Group " + i + ": " + process.env.CLIENT_URL + "/referral/" + user._id + "/" + i + "</li>"
           }

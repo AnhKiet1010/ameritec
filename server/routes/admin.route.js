@@ -58,7 +58,8 @@ const {
     updateCommissionToSuccess,
     testN,
     setIsCloneAcc,
-    checkChildPoint
+    checkChildPoint,
+    calChildPointAll
 } = require('../controllers/admin.controller');
 const upload = require('../middlewares/upload');
 
@@ -91,6 +92,7 @@ router.post('/blockUser', blockUser);
 router.post('/unblockUser', unBlockUser);
 
 router.post('/recal', calPointLevelAllUser);
+router.post('/recalChildPoint', calChildPointAll);
 router.post('/recal/:id', calPointLevel);
 
 router.post('/updateGroupNumber', updateGroupNumber);
