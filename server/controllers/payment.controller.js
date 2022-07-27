@@ -391,7 +391,7 @@ async function processDataActivation(data, token, trans_id, orderId) {
         user._id,
         links
       );
-
+      await checkChildPoint(user._id);
       // --------------- SEND THANKS MAIL -------------------
       if (invite_code !== process.env.INVITE_CODE) {
         const userOfInvite = await User.findOne({

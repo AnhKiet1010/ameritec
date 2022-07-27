@@ -21,6 +21,7 @@ const {
   reciveCommissonMail,
   createCloneBuyPackage4,
   paymentSuccessMail,
+  checkChildPoint
 } = require("./method");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
@@ -211,6 +212,7 @@ async function processDataActivation(data, token, trans_id, orderId) {
         // updateParent(invite_code, buy_package);
         await checkPoint(donate_sales_id);
         await checkLevel(donate_sales_id);
+        await checkChildPoint(donate_sales_id);
       }
 
       // --------------- GET APP ACTIVATIONS LINKS -------------------
@@ -231,7 +233,7 @@ async function processDataActivation(data, token, trans_id, orderId) {
         }).exec();
         await reciveCommissonMail(user._id);
       }
-
+      await checkChildPoint(user._id);
       // --------------- RESET TOKEN TO EMPTY -------------------
       await Transaction.findOneAndUpdate(
         { token },
