@@ -524,6 +524,7 @@ const checkChildPoint = async (id,flag_parent=true)=>{
       };
     }
     await user.save();
+    
     var tree = await Tree.findOne({parent:id}).exec();
     
     var totalchild1 = await countTotalChildMember(tree.group1);
@@ -533,10 +534,10 @@ const checkChildPoint = async (id,flag_parent=true)=>{
     var totalpoint1 = await sumPoint(tree.group1);
     var totalpoint2 = await sumPoint(tree.group2);
     var totalpoint3 = await sumPoint(tree.group3);
-  
-    // console.log("child",totalchild1 + "/"+totalchild2 + "/"+totalchild3 );
+    console.log("child",totalchild1 + "/"+totalchild2 + "/"+totalchild3 );
     // console.log("point",totalpoint1 + "/"+totalpoint2 + "/"+totalpoint3 );
-    // console.log("user",user);
+     console.log("user",user);
+
     var flag = false;
     if(totalchild1!=user.child1.countChild){
       user.child1.countChild=totalchild1;
@@ -563,9 +564,16 @@ const checkChildPoint = async (id,flag_parent=true)=>{
       user.child3.countPoint=totalpoint3;
       flag=true;
     }
-  
+    console.log("user change",user)
     if(flag){
-      await user.save();
+      //await user.save();
+      await User.findOneAndUpdate(
+        { _id: user._id }, 
+        { 
+          child1 : { arr: [], countChild: totalchild1, countPoint: totalpoint1},
+          child2 : { arr: [], countChild: totalchild2, countPoint: totalpoint2},
+          child3 : { arr: [], countChild: totalchild3, countPoint: totalpoint3},
+        }).exec();
       console.log("Update success: ",user.id);
       if(flag_parent==true){
         await checkChildPoint(user.parent_id);
