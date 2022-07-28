@@ -2151,6 +2151,10 @@ exports.editTree = async (req, res) => {
 
     await checkLevel(rootItem._id);
 
+    await checkChildPoint(moveItem.parent_id);
+
+    await checkChildPoint(rootItem._id);
+
     await checkPoint(moveItem.parent_id);
 
     await checkPoint(rootItem._id);
@@ -3025,15 +3029,26 @@ exports.calPointLevelAllUser = async (req, res) => {
     .exec();
   for (let user of listUser) {
     await checkPoint(user._id);
-    await checkLevel(user._id);
-    await checkChildPoint(user._id);
+   await checkLevel(user._id);
+    //await checkChildPoint(user._id,false);
   }
   res.json({
     status: 200,
     errors: ["hi"],
   });
+
 };
 
+exports.calChildPointAll =async (req,res)=>{
+  const listUser = await User.find({ $and: [{ role: { $ne: 'admin' } }, { role: { $ne: 'system' } }, { role: { $ne: 'accountant' } },{ role: { $ne: 'accountant1' } }] }).sort('created_time').exec();
+  for (let user of listUser) {
+    await checkChildPoint(user._id,false);
+  }
+  res.json({
+    status: 200,
+    errors: [listUser.length],
+  });
+}
 //tinh lại điểm,lv 1 thằng
 exports.calPointLevel = async (req, res) => {
   const { id } = req.params;
