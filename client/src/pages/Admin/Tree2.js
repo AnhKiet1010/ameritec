@@ -575,7 +575,7 @@ function TreeViewAdmin({ match }) {
         <ul>
           <li className="my-2"><span role="img" aria-label="emoji">❗</span> Tên người dùng màu <span className="text-blue-800 font-bold">xanh dương</span> : Gói doanh nghiệp A</li>
           <li className="my-2"><span role="img" aria-label="emoji">❗</span> Tên người dùng màu <span className="text-cyan-default font-bold">xanh ngọc</span> : Gói doanh nghiệp B</li>
-          <li className="my-2"><span role="img" aria-label="emoji">❗</span> Tên người dùng màu <span className="text-green-600 font-bold">xanh lá cây</span> : Gói khởi nghiệp</li>
+          <li className="my-2"><span role="img" aria-label="emoji">❗</span> Tên người dùng màu <span className="text-green-600 font-bold">xanh lá cây</span> : Gói gia đình</li>
           <li className="my-2"><span role="img" aria-label="emoji">❗</span> Tên người dùng màu <span className="text-gray-600 font-bold">xám</span> : Gói cá nhân</li>
           <li className="my-2"><span role="img" aria-label="emoji">❗</span> Tên người dùng màu <span className="text-red-600 font-bold">đỏ</span> : Tài khoản hết hạn</li>
           <li className="my-2"><span role="img" aria-label="emoji">❗</span> X (Số cấp dưới - Y số điểm)</li>

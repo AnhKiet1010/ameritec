@@ -718,7 +718,7 @@ function TreeHorizon() {
             </span>{" "}
             {t("Tên người dùng màu")}{" "}
             <span className="text-green-600 font-bold">{t("xanh lá cây")}</span>{" "}
-            : {t("Gói Khởi Nghiệp")}
+            : {t("Gói Gia Đình")}
           </li>
           <li className="my-2">
             <span role="img" aria-label="emoji">

@@ -799,7 +799,7 @@ function TreeViewAdmin({ match }) {
             </span>{" "}
             Tên người dùng màu{" "}
             <span className="text-green-600 font-bold">xanh lá cây</span> : Gói
-            khởi nghiệp
+            gia đình
           </li>
           <li className="my-2">
             <span role="img" aria-label="emoji">

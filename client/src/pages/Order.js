@@ -226,7 +226,7 @@ const Order = ({ match }) => {
             >
               <div className="prod-title p-5">
                 <p className="text-2xl uppercase text-gray-900 font-bold">
-                  {t("Gói Khởi Nghiệp")}
+                  {t("Gói Gia Đình")}
                 </p>
                 <p className="uppercase text-sm text-gray-800">
                   (4 {t("GIẤY PHÉP")}, 4 {t("THIẾT BỊ")})

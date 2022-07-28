@@ -513,7 +513,7 @@ function Dashboard() {
           {loadingCountPackage ? (
             <Skeleton variant="rect" width="100%" height={100} />
           ) : (
-            <InfoCard title={t("Gói Khởi Nghiệp")} value={totalStartupPackage}>
+            <InfoCard title={t("Gói Gia Đình")} value={totalStartupPackage}>
               <RoundIcon
                 icon={CartIcon}
                 iconColorClass="text-blue-500 dark:text-blue-100"

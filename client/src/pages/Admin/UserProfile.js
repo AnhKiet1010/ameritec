@@ -451,7 +451,7 @@ function UserProfile({ match }) {
           {loadingCountPackage ? (
             <Skeleton variant="rect" width="100%" height={100} />
           ) : (
-            <InfoCard title="Gói khởi nghiệp" value={totalStartupPackage}>
+            <InfoCard title="Gói gia đình" value={totalStartupPackage}>
               <RoundIcon
                 icon={CartIcon}
                 iconColorClass="text-blue-500 dark:text-blue-100"

@@ -353,7 +353,7 @@ function Receipts() {
                     Gói cá nhân
                   </option>
                   <option value={2} defaultValue={searchLevel === 2}>
-                    Gói khởi nghiệp
+                    Gói gia đình
                   </option>
                   <option value={3} defaultValue={searchLevel === 3}>
                     Gói doanh nghiệp A
