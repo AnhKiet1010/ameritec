@@ -67,7 +67,7 @@
     "socket.io-client": "^4.2.0",
     "styled-components": "^5.3.3",
     "xlsx": "^0.16.9",
-    "yup": "^0.31.1"
+    "yup": "^0.32.11"
   },
   "devDependencies": {
     "@release-it/conventional-changelog": "1.1.4",
